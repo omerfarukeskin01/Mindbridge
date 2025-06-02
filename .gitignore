@@ -11,6 +11,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Docker
+docker-compose.override.yml
+docker-compose.prod.yml
+.docker/
+
 # Logs
 logs
 *.log

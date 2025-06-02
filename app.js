@@ -26,6 +26,10 @@ const { requireAuth, requirePatient, requirePsychologist } = require('./middlewa
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy for Caprover/reverse proxy setup
+// This enables Express to trust X-Forwarded-* headers
+app.set('trust proxy', true);
+
 // Initialize Socket.io
 const io = SocketConfig.init(server);
 
@@ -86,7 +90,20 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`\n🕐 [${timestamp}] ${req.method} ${req.url}`);
-    console.log(`🌍 IP: ${req.ip}`);
+    
+    // Detailed IP logging for Caprover/reverse proxy debugging
+    console.log(`🌍 Client IP: ${req.ip}`);
+    console.log(`🔍 Remote Address: ${req.connection.remoteAddress || req.socket.remoteAddress}`);
+    if (req.headers['x-forwarded-for']) {
+        console.log(`🔄 X-Forwarded-For: ${req.headers['x-forwarded-for']}`);
+    }
+    if (req.headers['x-real-ip']) {
+        console.log(`🎯 X-Real-IP: ${req.headers['x-real-ip']}`);
+    }
+    if (req.headers['x-forwarded-proto']) {
+        console.log(`🔒 X-Forwarded-Proto: ${req.headers['x-forwarded-proto']}`);
+    }
+    
     console.log(`🔧 User-Agent: ${req.get('User-Agent')}`);
     
     if (req.session) {
