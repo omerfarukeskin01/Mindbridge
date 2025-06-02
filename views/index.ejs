@@ -1,0 +1,170 @@
+<!-- views/home.ejs  (veya index.ejs) -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mindbridge · Kampüs Psikolojik Danışmanlık</title>
+
+  <!-- Vendor -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- App -->
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <!-- Hero -->
+  <section class="hero text-white pt-7">
+    <div class="container">
+      <div class="row align-items-center gy-4">
+        <div class="col-lg-6">
+          <h1 class="display-4 fw-bold mb-3"><i class="fas fa-graduation-cap me-2"></i>Mindbridge</h1>
+          <p class="lead mb-4">Üniversite öğrencileri için tasarlanmış psikolojik danışmanlık platformu. Kampüs yaşamında her adımda yanındayız.</p>
+
+          <% if (!user) { %>
+            <div class="d-flex flex-column flex-sm-row gap-3">
+              <a class="btn btn-light btn-lg" href="/register"><i class="fas fa-user-plus me-2"></i>Ücretsiz Başla</a>
+              <a class="btn btn-outline-light btn-lg" href="/login"><i class="fas fa-sign-in-alt me-2"></i>Giriş Yap</a>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="col-lg-6 text-center">
+          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80"
+               class="img-fluid rounded shadow" alt="Üniversite Öğrencileri">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Neden Destek -->
+  <section class="py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold display-6">Neden Destek?</h2>
+        <p class="lead text-muted">Üniversite yolculuğunu kolaylaştırmak için uzman ekibimizle buradayız.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4" data-animate>
+          <div class="card p-4 text-center h-100">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <h5>Uyum Desteği</h5>
+            <p class="text-muted">Yeni arkadaşlıklar, yurt yaşamı ve sosyal uyum için rehberlik.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4" data-animate>
+          <div class="card p-4 text-center h-100">
+            <div class="card-icon" style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%)"><i class="fas fa-brain"></i></div>
+            <h5>Akademik Stres</h5>
+            <p class="text-muted">Sınav kaygısı ve motivasyon konularında bilimsel destek.</p>
+          </div>
+        </div>
+
+        <div class="col-md-4" data-animate>
+          <div class="card p-4 text-center h-100">
+            <div class="card-icon" style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%)"><i class="fas fa-heart"></i></div>
+            <h5>Kişisel Gelişim</h5>
+            <p class="text-muted">Özgüven, iletişim becerileri ve geleceğe hazırlık.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sık Sorunlar -->
+  <section class="py-5 bg-white">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold display-6">Nerede Yardım Lazım?</h2>
+        <p class="lead text-muted">Üniversitelilerin en sık yaşadığı zorluklarda yanındayız.</p>
+      </div>
+
+      <div class="row g-4">
+        <% const topics = [
+              {icon:'fa-home',   color:'primary',   title:'Aile Özlemi'},
+              {icon:'fa-user-friends',color:'accent',title:'Sosyal İlişkiler'},
+              {icon:'fa-book',   color:'warning',   title:'Ders Çalışma'},
+              {icon:'fa-heart-broken',color:'danger',title:'İlişki Sorunları'},
+              {icon:'fa-money-bill-wave',color:'success',title:'Ekonomik Endişe'},
+              {icon:'fa-route',  color:'secondary', title:'Kariyer Belirsizliği'},
+              {icon:'fa-clock',  color:'primary-dark',title:'Zaman Yönetimi'},
+              {icon:'fa-sad-tear',color:'accent-dark',title:'Duygusal Sorunlar'},
+            ]; %>
+        <% topics.forEach(t=>{ %>
+          <div class="col-6 col-lg-3" data-animate>
+            <div class="card text-center p-3 h-100">
+              <i class="fas <%= t.icon %> fa-2x text-<%= t.color %> mb-3"></i>
+              <h6><%= t.title %></h6>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nasıl Çalışır -->
+  <section class="py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold display-6">3 Kolay Adım</h2>
+        <p class="lead text-muted">Destek almak sandığın kadar zor değil.</p>
+      </div>
+
+      <div class="row text-center g-4">
+        <% const steps = ['Ücretsiz Kayıt','Danışman Seçin','Danışmanlığa Başlayın']; %>
+        <% steps.forEach((s,i)=>{ %>
+          <div class="col-md-4" data-animate>
+            <div class="step-circle mx-auto mb-3"><%= i+1 %></div>
+            <h5><%= s %></h5>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-5 text-white cta-glow bg-primary">
+    <div class="container text-center">
+      <h2 class="fw-bold display-6 mb-3">Kampüs Yaşamını Hafiflet</h2>
+      <p class="lead mb-4">Profesyonel destekle potansiyelini ortaya çıkar.</p>
+      <% if (!user) { %>
+        <a class="btn btn-light btn-lg me-2" href="/register"><i class="fas fa-user-plus me-2"></i>Kayıt Ol</a>
+        <a class="btn btn-outline-light btn-lg" href="/psychologists"><i class="fas fa-search me-2"></i>Danışmanları Gör</a>
+      <% } %>
+    </div>
+  </section>
+
+<%- include('partials/footer') %>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Animate on scroll
+    const animatedElements = document.querySelectorAll('[data-animate]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    });
+
+    animatedElements.forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .user-row:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar min-vh-100 p-3">
+                    <div class="text-center text-white mb-4">
+                        <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                        <h5>Admin Panel</h5>
+                        <small><%= admin.name %></small>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        <a class="nav-link rounded mb-2" href="/admin/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                        <a class="nav-link rounded mb-2" href="/admin/pending-psychologists">
+                            <i class="fas fa-user-clock me-2"></i>
+                            Psikolog Onayları
+                        </a>
+                        <a class="nav-link active rounded mb-2" href="/admin/users">
+                            <i class="fas fa-users me-2"></i>
+                            Kullanıcı Yönetimi
+                        </a>
+                        <hr class="text-white">
+                        <a class="nav-link rounded text-warning" href="/admin/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Çıkış Yap
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 fw-bold">
+                            <i class="fas fa-users text-primary me-2"></i>
+                            Kullanıcı Yönetimi
+                        </h1>
+                        <a href="/admin/dashboard" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Dashboard'a Dön
+                        </a>
+                    </div>
+                    
+                    <!-- Flash Messages -->
+                    <% if (typeof messages !== 'undefined') { %>
+                        <% if (messages.error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <%= messages.error %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                        <% if (messages.success) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <%= messages.success %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                    <% } %>
+
+                    <!-- Users List -->
+                    <% if (users && users.length > 0) { %>
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-list me-2"></i>
+                                            Tüm Kullanıcılar (<%= users.length %>)
+                                        </h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-light btn-sm" onclick="filterUsers('all')">
+                                                <i class="fas fa-users me-1"></i>
+                                                Tümü
+                                            </button>
+                                            <button class="btn btn-outline-light btn-sm" onclick="filterUsers('patient')">
+                                                <i class="fas fa-user me-1"></i>
+                                                Hastalar
+                                            </button>
+                                            <button class="btn btn-outline-light btn-sm" onclick="filterUsers('psychologist')">
+                                                <i class="fas fa-user-md me-1"></i>
+                                                Psikologlar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Kullanıcı</th>
+                                                <th>Rol</th>
+                                                <th>Durum</th>
+                                                <th>Kayıt Tarihi</th>
+                                                <th>İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% users.forEach(user => { %>
+                                                <tr class="user-row" data-role="<%= user.role %>">
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="bg-<%= user.role === 'psychologist' ? 'success' : 'info' %> rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                                                 style="width: 40px; height: 40px;">
+                                                                <i class="fas fa-<%= user.role === 'psychologist' ? 'user-md' : 'user' %> text-white"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-0"><%= user.name %></h6>
+                                                                <small class="text-muted"><%= user.email %></small>
+                                                                <% if (user.phone) { %>
+                                                                    <br><small class="text-muted">
+                                                                        <i class="fas fa-phone me-1"></i>
+                                                                        <%= user.phone %>
+                                                                    </small>
+                                                                <% } %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <% if (user.role === 'psychologist') { %>
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-user-md me-1"></i>
+                                                                Psikolog
+                                                            </span>
+                                                            <% if (user.specialization) { %>
+                                                                <br><small class="text-muted"><%= user.specialization %></small>
+                                                            <% } %>
+                                                        <% } else { %>
+                                                            <span class="badge bg-info">
+                                                                <i class="fas fa-user me-1"></i>
+                                                                Hasta
+                                                            </span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (user.role === 'psychologist') { %>
+                                                            <% if (user.isApproved) { %>
+                                                                <span class="badge bg-success">
+                                                                    <i class="fas fa-check me-1"></i>
+                                                                    Onaylı
+                                                                </span>
+                                                            <% } else { %>
+                                                                <span class="badge bg-warning">
+                                                                    <i class="fas fa-clock me-1"></i>
+                                                                    Beklemede
+                                                                </span>
+                                                            <% } %>
+                                                        <% } else { %>
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-check me-1"></i>
+                                                                Aktif
+                                                            </span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <small>
+                                                            <%= moment(user.createdAt).format('DD/MM/YYYY') %>
+                                                            <br>
+                                                            <span class="text-muted">
+                                                                <%= moment(user.createdAt).format('HH:mm') %>
+                                                            </span>
+                                                        </small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                                                    type="button" data-bs-toggle="dropdown">
+                                                                <i class="fas fa-cog me-1"></i>
+                                                                İşlemler
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <a class="dropdown-item" href="/admin/users/<%= user._id %>">
+                                                                        <i class="fas fa-eye me-2"></i>
+                                                                        Detayları Görüntüle
+                                                                    </a>
+                                                                </li>
+                                                                <li><hr class="dropdown-divider"></li>
+                                                                <li>
+                                                                    <a class="dropdown-item text-danger" href="#" 
+                                                                       onclick="confirmDelete('<%= user._id %>', '<%= user.name %>')">
+                                                                        <i class="fas fa-trash me-2"></i>
+                                                                        Kullanıcıyı Sil
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Henüz kullanıcı yok</h4>
+                            <p class="text-muted">Sisteme henüz hiç kullanıcı kaydolmamış.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Kullanıcıyı Sil
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <strong id="userName"></strong> adlı kullanıcıyı silmek istediğinizden emin misiniz?
+                    </p>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Uyarı:</strong> Bu işlem geri alınamaz. Kullanıcının tüm verileri (randevular, mesajlar vb.) silinecektir.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <form id="deleteForm" method="POST" class="d-inline">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>
+                            Kullanıcıyı Sil
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2"></i>
+                        Kullanıcı Detayları
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="userDetailsContent">
+                    <!-- User details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(userId, userName) {
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('deleteForm').action = `/admin/users/${userId}`;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        function filterUsers(role) {
+            const rows = document.querySelectorAll('.user-row');
+            
+            rows.forEach(row => {
+                if (role === 'all' || row.dataset.role === role) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function viewUserDetails(userId) {
+            // Find user data from the current page
+            const users = <%- JSON.stringify(users) %>;
+            const user = users.find(u => u._id === userId);
+            
+            if (user) {
+                const detailsHtml = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Temel Bilgiler</h6>
+                            <p><strong>Ad:</strong> ${user.name}</p>
+                            <p><strong>E-posta:</strong> ${user.email}</p>
+                            ${user.phone ? `<p><strong>Telefon:</strong> ${user.phone}</p>` : ''}
+                            <p><strong>Rol:</strong> ${user.role === 'psychologist' ? 'Psikolog' : 'Hasta'}</p>
+                            <p><strong>Kayıt Tarihi:</strong> ${moment(user.createdAt).format('DD/MM/YYYY HH:mm')}</p>
+                            <p><strong>Durum:</strong> 
+                                ${user.role === 'psychologist' ? 
+                                    (user.isApproved ? 'Onaylı' : 'Onay Bekliyor') : 
+                                    'Aktif'
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            ${user.role === 'psychologist' ? `
+                                <h6>Psikolog Bilgileri</h6>
+                                <p><strong>Uzmanlık:</strong> ${user.specialization}</p>
+                                <p><strong>Deneyim:</strong> ${user.experience} yıl</p>
+                                <p><strong>Lisans No:</strong> ${user.license}</p>
+                                ${user.bio ? `<p><strong>Hakkında:</strong> ${user.bio}</p>` : ''}
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('userDetailsContent').innerHTML = detailsHtml;
+                const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+                modal.show();
+            }
+        }
+    </script>
+</body>
+</html> 

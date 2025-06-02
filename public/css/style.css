@@ -1,0 +1,737 @@
+/* /css/style.css  ── Mindbridge v2 */
+
+/* ---------- 1. Tema ---------- */
+:root {
+  /* Renk Paleti (sakin mor + taze turkuaz) */
+  --primary: #7b5ff1;
+  --primary-dark: #5b3df0;
+  --accent: #0ec9b2;       /* Hex: #0ec9b2 */
+  --accent-dark: #0ba990;
+
+  /* RGB Karşılıkları (Bootstrap 5.3+ --bs-primary-rgb gibi değişkenler sunar) */
+  /* --primary-rgb: 123,95,241; (Bootstrap --bs-primary-rgb kullanır) */
+  --accent-rgb: 14,201,178; /* Accent için manuel tanımlama */
+
+
+  --success: #20c997;
+  --warning: #ffb547;
+  --danger:  #f15f79;
+  --gray-100: #f9fafb;
+  --gray-900: #212529;
+
+  /* UI */
+  --radius-sm: .5rem;
+  --radius-md: .8rem;
+  --radius-lg: 1.25rem;
+  --shadow-sm: 0 2px 6px rgba(0,0,0,.05);
+  --shadow-md: 0 6px 20px rgba(0,0,0,.10);
+}
+
+/* ---------- 2. Genel ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{
+  scroll-behavior:smooth;
+}
+body{
+  font-family:"Inter","Segoe UI",sans-serif;
+  background:var(--gray-100);
+  color:var(--gray-900);
+  -webkit-font-smoothing:antialiased;
+  position: relative; /* Pseudo-elementlerin body'e göre konumlanması için */
+}
+a{color:inherit;text-decoration:none;transition:color .2s}
+a:hover{color:var(--primary-dark)}
+
+/* ---------- 3. Navbar ---------- */
+.navbar{
+  background:transparent;
+  backdrop-filter:blur(6px);
+  transition:background-color .3s;
+}
+.navbar.scrolled{background:rgba(123,95,241,.9)}
+.navbar-brand{font-weight:700;letter-spacing:-.4px}
+
+/* ---------- 4. Hero ---------- */
+.hero{
+  position:relative;
+  padding:6rem 0 5rem;
+  overflow:hidden;
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+}
+.hero::before,
+.hero::after{
+  content:"";
+  position:absolute;
+  border-radius:50%;
+  filter:blur(80px);
+  opacity:.25;
+  z-index: 0;
+}
+.hero::before{
+  width:520px;height:520px;
+  top:-200px;right:-200px;
+  background:var(--accent);
+}
+.hero::after{
+  width:460px;height:460px;
+  bottom:-180px;left:-180px;
+  background:var(--accent-dark);
+}
+
+/* ---------- 5. Kartlar ---------- */
+.card{ /* Genel Kart Stili */
+  border:none;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  transition:transform .25s,box-shadow .25s;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(8px);
+  position: relative;
+  z-index: 1;
+}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.card-icon{
+  width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  margin:0 auto 1rem;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);
+  color:#fff;font-size:1.5rem;
+}
+
+/* ---------- 6. Butonlar ---------- */
+.btn{
+  border:none;
+  border-radius:var(--radius-sm);
+  font-weight:600;
+  box-shadow:var(--shadow-sm);
+  transition:transform .2s,box-shadow .2s, background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out;
+}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  color:#fff;
+}
+.btn-outline-light{color:#fff;border:2px solid #fff}
+.btn-light{color:var(--primary-dark)}
+.btn-light:hover{box-shadow:var(--shadow-md)}
+
+/* ---------- 7. Formlar ---------- */
+.form-control, .form-select {
+  border-radius:var(--radius-sm);
+  border:1px solid #dee2e6;
+}
+.form-control:focus, .form-select:focus {
+  border-color:var(--primary);
+  box-shadow:0 0 0 .25rem rgba(var(--bs-primary-rgb),.25)
+}
+
+/* ---------- 8. Adım Balonları ---------- */
+.step-circle{
+  width:56px;height:56px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-weight:700;
+  background:#fff;color:var(--primary);
+  position:relative;
+}
+.step-circle::after{
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  z-index:-1;
+}
+
+/* ---------- 9. Animasyonlar ---------- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+[data-animate]{opacity:0}
+[data-animate].in-view{opacity:1;animation:fadeUp .6s both}
+
+
+/* ---------- YETKİLENDİRME (AUTH) SAYFALARI ÖZEL STİLLERİ ---------- */
+body.body-auth {
+  background: var(--gray-100);
+  overflow-x: hidden;
+}
+
+body.body-auth::before,
+body.body-auth::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+  z-index: -1;
+}
+
+body.body-auth::before {
+  width: 40vw; height: 40vw;
+  max-width: 380px; max-height: 380px;
+  top: 5vh; right: 5vw;
+  background: var(--accent);
+}
+
+body.body-auth::after {
+  width: 35vw; height: 35vw;
+  max-width: 330px; max-height: 330px;
+  bottom: 8vh; left: 8vw;
+  background: var(--primary);
+}
+
+.auth-card { /* Hem login hem register kartları için ortak */
+  border-top: 4px solid var(--primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.auth-card .card-body {
+  padding: 2.5rem;
+}
+
+.auth-card .auth-icon { /* Giriş ve Kayıt sayfalarındaki ana ikonlar */
+  font-size: 3.25rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.auth-card h2.fw-bold {
+    margin-bottom: 0.5rem;
+}
+
+.auth-links a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color .2s ease-in-out, text-decoration .2s ease-in-out;
+}
+.auth-links a:hover {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
+/* Rol Seçimi Butonları (Kayıt Sayfası) */
+.role-selector .btn-check + .btn {
+    padding: 0.75rem 0.5rem;
+    font-weight: 500;
+    border-width: 1px;
+    font-size: 0.9rem;
+}
+.role-selector .btn-check + .btn .fas {
+    font-size: 1.3rem;
+    margin-bottom: 0.25rem !important;
+}
+
+.role-selector .btn-check:checked + .btn {
+    background-color: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
+}
+
+.role-selector .btn-check:focus + .btn {
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
+}
+
+/* Psikolog Uyarı Kutusu (Kayıt Sayfası) */
+#psychologistWarning.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    border-color: rgba(var(--bs-info-rgb), 0.3);
+    color: var(--bs-info-emphasis, #087990);
+}
+#psychologistWarning.alert-info .fa-info-circle {
+    color: var(--bs-info-emphasis, #087990);
+}
+
+
+/* Input Group İkonları */
+.input-group .input-group-text {
+  background-color: var(--bs-gray-100, #f8f9fa);
+  border-color: var(--bs-gray-300, #ced4da);
+}
+
+/* Flash Mesajlar (Alerts) */
+.alert {
+    border-radius: var(--radius-sm);
+}
+
+/* Psikolog Bilgi Kartı (Login Sayfası) */
+.card.border-warning.bg-warning.bg-opacity-10 {
+    border-radius: var(--radius-md);
+}
+
+
+/* ---------- HASTA DASHBOARD ÖZEL STİLLERİ (LIGHT MODE) ---------- */
+.welcome-card-patient .fa-user-circle {
+  background-color: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  padding: 8px;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+.welcome-card-patient h3 { font-weight: 600; }
+
+.quick-action-card .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.quick-action-card .card-body > .fas,
+.quick-action-card .card-body > .far,
+.quick-action-card .card-body > .fal {
+  transition: transform 0.25s ease-out;
+  margin-bottom: 0.75rem;
+}
+.quick-action-card:hover .card-body > .fas,
+.quick-action-card:hover .card-body > .far,
+.quick-action-card:hover .card-body > .fal {
+  transform: translateY(-5px) scale(1.05);
+}
+.quick-action-card h6 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--bs-gray-700);
+}
+.quick-action-card .btn-sm {
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+}
+.quick-action-card .text-muted {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.table-appointments th {
+  font-weight: 600;
+  color: var(--bs-gray-700);
+}
+.table-appointments .badge {
+  font-size: 0.78em;
+  padding: 0.45em 0.7em;
+  font-weight: 500;
+}
+.table-appointments .d-flex .fa-user-md {
+  font-size: 1.3em;
+}
+
+.sidebar-info-card .card-header {
+  background-color: var(--bs-gray-100);
+  border-bottom: 1px solid var(--bs-gray-300);
+  padding: 0.65rem 1rem;
+}
+.sidebar-info-card .card-header h6 {
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0;
+}
+.sidebar-info-card .card-header .fas {
+  font-size: 0.9em;
+}
+.sidebar-info-card hr {
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-top: 1px solid var(--bs-gray-200);
+}
+.sidebar-info-card .d-flex.justify-content-between small:first-child {
+  font-weight: 500;
+}
+
+
+/* ---------- 10. Dark Mode GENEL ve SAYFA ÖZELİ AYARLARI ---------- */
+@media (prefers-color-scheme:dark){
+  body{
+    background:#121212;
+    color:#e5e5e5;
+  }
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient){
+    background:rgba(38, 38, 42, 0.92);
+    color: #e5e5e5;
+  }
+
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) .card-title,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h1,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h2,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h3,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h4,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h5,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) h6,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) .card-text,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) p,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) small,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) label {
+    color: #e5e5e5 !important;
+  }
+
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) .text-muted,
+  .card:not(.auth-card):not(.border-warning):not(.welcome-card-patient) small.text-muted {
+    color: #a0a0a0 !important;
+  }
+
+
+  .navbar.scrolled{background:rgba(var(--bs-primary-rgb),.65)}
+
+  /* --- Auth Sayfaları Dark Mode --- */
+  body.body-auth {
+    background: #1a1a1d;
+    color: #c5c5c5;
+  }
+  body.body-auth::before,
+  body.body-auth::after {
+    opacity: 0.08;
+    filter: blur(150px);
+  }
+  .auth-card {
+    background: rgba(35,35,40,.92);
+    border-top-color: var(--accent);
+    color: #e0e0e0;
+  }
+  .auth-card .card-title,
+  .auth-card .card-text,
+  .auth-card .form-label,
+  .auth-card .form-check-label,
+  .auth-card h5 {
+      color: #e0e0e0;
+  }
+  .auth-card .auth-icon {
+     background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; text-fill-color: transparent;
+  }
+  .auth-card .text-muted { color: #909090 !important; }
+  .auth-links, .auth-links p { color: #c5c5c5; }
+  .auth-links a { color: var(--accent); font-weight: 600; }
+  .auth-links a:hover { color: var(--primary); }
+  .auth-card .form-check-label a { color: var(--accent); font-weight: 600; }
+  .auth-card .form-check-label a:hover { color: var(--primary); }
+
+  .input-group .input-group-text {
+    background-color: #2a2a2e; border-color: #4a4a4e; color: #bbb;
+  }
+  .form-control, .form-select {
+      background-color: #2c2c30; border-color: #4a4a4e; color: #e0e0e0;
+  }
+  .form-control::placeholder { color: #999; }
+  .form-select { color: #e0e0e0; }
+  .form-control:focus, .form-select:focus {
+      background-color: #2c2c30; color: #e0e0e0;
+      border-color: var(--accent);
+      box-shadow:0 0 0 .2rem rgba(var(--accent-rgb),.25);
+  }
+  .role-selector .btn-check + .btn {
+    color: #ccc; background-color: rgba(var(--bs-secondary-rgb), 0.15);
+    border-color: var(--bs-gray-700, #343a40);
+  }
+  .role-selector .btn-check + .btn:hover {
+      background-color: rgba(var(--accent-rgb), 0.2); border-color: var(--accent); color: var(--accent);
+  }
+  .role-selector .btn-check:checked + .btn {
+    background-color: var(--accent); color: var(--gray-900); border-color: var(--accent);
+    box-shadow: 0 0 0 .2rem rgba(var(--accent-rgb), .35);
+  }
+  .role-selector .btn-check:focus + .btn {
+    border-color: var(--accent-dark); box-shadow: 0 0 0 .2rem rgba(var(--accent-rgb), .25);
+  }
+  .role-selector .btn-check:checked:focus + .btn {
+    background-color: var(--accent-dark); border-color: var(--accent-dark);
+    box-shadow: 0 0 0 .2rem rgba(var(--accent-rgb), .35);
+  }
+  #psychologistWarning.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.15);
+    border-color: rgba(var(--bs-info-rgb), 0.4);
+  }
+  #psychologistWarning.alert-info,
+  #psychologistWarning.alert-info .fa-info-circle,
+  #psychologistWarning.alert-info h6,
+  #psychologistWarning.alert-info p,
+  #psychologistWarning.alert-info strong { color: #b0f5ff; }
+  #psychologistWarning.alert-info .text-muted { color: #90c5cf !important; }
+
+  .card.border-warning.bg-warning.bg-opacity-10 {
+      background-color: rgba(var(--bs-warning-rgb), 0.1) !important;
+      border-color: rgba(var(--bs-warning-rgb), 0.5) !important;
+      color: var(--bs-warning-text-emphasis) !important;
+  }
+  .card.border-warning.bg-warning.bg-opacity-10 .text-warning,
+  .card.border-warning.bg-warning.bg-opacity-10 h5,
+  .card.border-warning.bg-warning.bg-opacity-10 p,
+  .card.border-warning.bg-warning.bg-opacity-10 small {
+      color: var(--bs-warning-text-emphasis) !important;
+      opacity: 0.95;
+  }
+   .card.border-warning.bg-warning.bg-opacity-10 .alert-warning {
+      background-color: rgba(var(--bs-warning-rgb), 0.15) !important;
+      color: var(--bs-warning-text-emphasis) !important;
+  }
+
+
+  /* --- Hasta Dashboard Dark Mode İyileştirmeleri --- */
+  /* .welcome-card-patient Hoş geldin kartı zaten renkli, metinleri beyaz, genellikle sorunsuz */
+  .welcome-card-patient .fa-user-circle {
+      background-color: rgba(255,255,255,0.1);
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  }
+
+  /* .quick-action-card h6, .quick-action-card .text-muted, vb. yukarıdaki
+     .card:not(.auth-card):not(.border-warning) ... seçicilerinden stillerini almalı */
+
+  .table-appointments th { color: #d0d0d0 !important; }
+  .table-appointments {
+      --bs-table-border-color: var(--bs-gray-700);
+      --bs-table-color: #c5c5c5;
+      --bs-table-striped-color: #d0d0d0;
+      --bs-table-active-color: #d5d5d5;
+      --bs-table-hover-color: #d5d5d5;
+  }
+  .table-appointments .table-light { /* thead */
+      --bs-table-bg: rgba(40, 42, 48, 0.85);
+      --bs-table-color: #e5e5e5;
+  }
+  .table-appointments tbody tr:hover {
+       --bs-table-hover-bg: rgba(var(--bs-secondary-rgb), 0.25);
+  }
+  .table-appointments small.text-muted { color: #a0a0a0 !important; }
+
+
+  .sidebar-info-card .card-header {
+      background-color: rgba(40, 42, 48, 0.85);
+      border-bottom-color: var(--bs-gray-700);
+  }
+  .sidebar-info-card .card-header h6 {
+      color: var(--accent) !important;
+  }
+  /* .sidebar-info-card .card-body içindeki metinler genel kart kurallarından miras almalı */
+  .sidebar-info-card hr { border-top-color: var(--bs-gray-700); }
+
+
+  /* --- MODAL KARANLIK MOD STİLLERİ (YENİ EKLENEN) --- */
+  .modal-content {
+    background-color: #26282a; /* Koyu modal arkaplanı */
+    color: #e0e0e0; /* Modal içi varsayılan metin rengi */
+    border: 1px solid #3a3f44; /* Hafif kenarlık */
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #4a4a4e; /* Başlık altı kenarlık */
+  }
+  .modal-header .modal-title {
+    color: #e5e5e5; /* Modal başlığı rengi */
+  }
+  .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Kapatma butonu (X) beyaz yapar */
+  }
+
+  .modal-body {
+    /* Modal body içindeki metinler (.form-label vs.) zaten yukarıdaki genel kurallardan miras almalı */
+  }
+  .modal-body .form-label { /* Modal içindeki form etiketleri için ek kesinlik */
+    color: #e0e0e0 !important;
+  }
+
+
+  .modal-footer {
+    border-top: 1px solid #4a4a4e; /* Altbilgi üstü kenarlık */
+    background-color: #222426; /* Hafif farklı altbilgi arkaplanı (opsiyonel) */
+  }
+
+  .modal-footer .btn-secondary { /* Modal içindeki "İptal" gibi secondary butonlar */
+    background-color: #495057;
+    border-color: #495057;
+    color: #fff;
+  }
+  .modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+  /* .btn-primary modal içinde zaten gradient ve beyaz yazı ile iyi görünmeli */
+
+
+  /* --- GENEL DARK MODE METİN RENK TUTARLILIĞI (SON KONTROL) --- */
+  /* Auth olmayan sayfalarda genel body metin rengi */
+  body:not(.body-auth) {
+    color: #e5e5e5;
+  }
+  /* Auth olmayan sayfalarda .text-muted */
+  body:not(.body-auth) .text-muted,
+  .card:not(.auth-card):not(.border-warning) .text-muted { /* .text-muted için genel kural */
+    color: #a0a0a0 !important;
+  }
+}
+
+/* ---------- PSİKOLOG DASHBOARD ÖZEL STİLLERİ ---------- */
+
+/* Hoş Geldin Kartı (Psikolog) */
+.welcome-card-psychologist {
+  /* Mevcut bg-gradient-primary zaten güçlü bir görünüm sağlıyor. */
+  /* Ekstra gölge veya ince bir iç parlama eklenebilir. */
+  box-shadow: 0 8px 25px rgba(var(--bs-primary-rgb), 0.3), var(--shadow-md);
+  overflow: hidden; /* ::after için */
+  position: relative;
+}
+.welcome-card-psychologist::after { /* Çok ince bir desen veya doku */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 0;
+}
+.welcome-card-psychologist > .card-body { /* İçeriğin pseudo-element üzerinde kalması için */
+  position: relative;
+  z-index: 1;
+}
+.welcome-card-psychologist .bg-white.bg-opacity-20 { /* İkon tutucu */
+  transition: transform 0.3s ease;
+}
+.welcome-card-psychologist:hover .bg-white.bg-opacity-20 {
+  transform: scale(1.1);
+}
+
+/* İstatistik Kartları (Psikolog) */
+.stat-card-psychologist {
+  /* Mevcut stiliniz zaten iyi (border-0 shadow-sm). */
+  /* Hover'da hafifçe büyüme veya daha belirgin gölge eklenebilir */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.stat-card-psychologist:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md) !important; /* shadow-sm'i ezmek için */
+}
+.stat-card-psychologist .bg-opacity-10 { /* İkon arkaplanı */
+  transition: background-color 0.3s ease;
+}
+.stat-card-psychologist:hover .bg-opacity-10 {
+  background-color: rgba(var(--bs-primary-rgb), 0.18) !important; /* Örnek: primary için, diğerleri de benzer şekilde ayarlanabilir */
+}
+/* Diğer renkler için (success, info, warning) benzer hover stilleri eklenebilir:
+.stat-card-psychologist:hover .bg-success.bg-opacity-10 { background-color: rgba(var(--bs-success-rgb), 0.18) !important; }
+.stat-card-psychologist:hover .bg-info.bg-opacity-10 { background-color: rgba(var(--bs-info-rgb), 0.18) !important; }
+.stat-card-psychologist:hover .bg-warning.bg-opacity-10 { background-color: rgba(var(--bs-warning-rgb), 0.18) !important; }
+*/
+.stat-card-psychologist h4 { font-weight: 700; }
+.stat-card-psychologist small.text-muted { font-size: 0.85em; }
+
+/* Randevu Yönetimi Sekmeleri */
+.appointment-tabs-psychologist .nav-link {
+  color: var(--bs-gray-600);
+  font-weight: 500;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-width: 1px;
+  border-bottom-width: 0;
+  margin-bottom: -1px; /* Aktif tab border'ı ile hizalamak için */
+  padding: 0.6rem 1rem;
+}
+.appointment-tabs-psychologist .nav-link.active {
+  color: var(--primary);
+  background-color: var(--bs-body-bg); /* Kartın arkaplanıyla aynı */
+  border-color: var(--bs-border-color) var(--bs-border-color) var(--bs-body-bg);
+  font-weight: 600;
+}
+.appointment-tabs-psychologist .nav-link:hover:not(.active) {
+  border-color: var(--bs-border-color-translucent);
+  background-color: var(--bs-gray-100);
+}
+.appointment-tabs-psychologist + .tab-content { /* Sekme içeriği için */
+  border: 1px solid var(--bs-border-color);
+  border-top: none; /* Sekme çizgisiyle birleşmesi için */
+  padding: 1rem; /* Eğer card-body padding'i varsa bu gereksiz olabilir */
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+
+/* Randevu Tabloları (Psikolog) */
+.table-appointments-psychologist th {
+font-weight: 600;
+color: var(--bs-gray-700);
+font-size: 0.9em;
+}
+.table-appointments-psychologist .badge {
+font-size: 0.78em;
+padding: 0.45em 0.7em;
+font-weight: 500;
+}
+.table-appointments-psychologist .fa-user { /* Hasta ikonu */
+font-size: 1.1em;
+}
+
+/* Yan Panel - Bugünün Programı Kartı */
+.sidebar-schedule-psychologist .card-header {
+  /* Mevcut bg-primary text-white iyi görünüyor */
+  padding: 0.75rem 1rem;
+}
+.sidebar-schedule-psychologist .card-header h6 {
+  font-weight: 600;
+}
+.sidebar-schedule-psychologist .bg-light.rounded { /* Her bir randevu öğesi */
+  border: 1px solid var(--bs-gray-200);
+  transition: box-shadow 0.2s ease;
+}
+.sidebar-schedule-psychologist .bg-light.rounded:hover {
+  box-shadow: var(--shadow-sm);
+}
+.sidebar-schedule-psychologist .bg-primary.rounded-circle { /* Sıra numarası balonu */
+  flex-shrink: 0; /* Küçülmesini engelle */
+}
+
+
+/* ---------- KARANLIK MOD UYARLAMALARI (PSİKOLOG DASHBOARD) ---------- */
+@media (prefers-color-scheme: dark) {
+  .welcome-card-psychologist {
+      box-shadow: 0 8px 25px rgba(var(--bs-primary-rgb), 0.2), var(--shadow-md);
+  }
+  .welcome-card-psychologist::after {
+      opacity: 0.3; /* Karanlıkta desen daha belirgin olabilir */
+       /* fill='%23000000' fill-opacity='0.08' şeklinde değiştirilebilir */
+  }
+
+  .stat-card-psychologist:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,.25) !important; /* Karanlık modda gölge */
+  }
+  /* Stat kart ikon arkaplan hover renkleri */
+  .stat-card-psychologist:hover .bg-opacity-10 { background-color: rgba(var(--bs-primary-rgb), 0.25) !important; }
+  .stat-card-psychologist:hover .bg-success.bg-opacity-10 { background-color: rgba(var(--bs-success-rgb), 0.25) !important; }
+  .stat-card-psychologist:hover .bg-info.bg-opacity-10 { background-color: rgba(var(--bs-info-rgb), 0.25) !important; }
+  .stat-card-psychologist:hover .bg-warning.bg-opacity-10 { background-color: rgba(var(--bs-warning-rgb), 0.25) !important; }
+  .stat-card-psychologist small.text-muted { color: var(--bs-gray-500) !important; }
+
+
+  .appointment-tabs-psychologist .nav-link {
+      color: var(--bs-gray-500);
+      border-color: transparent; /* Kenarlıkları kaldır, aktif olunca eklenecek */
+  }
+  .appointment-tabs-psychologist .nav-link.active {
+      color: var(--accent); /* Aktif sekme rengi */
+      background-color: var(--bs-body-bg); /* Kartın arkaplanı */
+      border-color: var(--bs-gray-700) var(--bs-gray-700) var(--bs-body-bg);
+  }
+  .appointment-tabs-psychologist .nav-link:hover:not(.active) {
+      border-color: var(--bs-gray-700);
+      background-color: var(--bs-gray-800);
+      color: var(--bs-gray-300);
+  }
+  .appointment-tabs-psychologist + .tab-content {
+      border-color: var(--bs-gray-700);
+  }
+
+  .table-appointments-psychologist th {
+      color: var(--bs-gray-400) !important;
+  }
+  /* .table-appointments-psychologist için genel tablo renkleri zaten ana CSS'teki
+     .table-appointments karanlık mod stillerinden miras alınabilir veya buraya eklenebilir. */
+
+  .sidebar-schedule-psychologist .bg-light.rounded {
+      background-color: var(--bs-gray-800) !important; /* .bg-light'ı ezmek için */
+      border-color: var(--bs-gray-700);
+  }
+  .sidebar-schedule-psychologist .bg-light.rounded:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+}

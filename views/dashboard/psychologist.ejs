@@ -1,0 +1,623 @@
+<%- include('../partials/header', {
+    title: 'Psikolog Dashboard',
+    currentPage: 'dashboard'
+}) %>
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Psikolog Dashboard - Mindbridge</title>
+  <!-- Bootstrap & FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Kendi stil dosyan -->
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+  
+
+  <!-- Flash Messages -->
+  <div class="container mt-3">
+    <!-- "messages" objesi varsa ve warning özelliği doluysa göster -->
+    <% if (typeof messages !== 'undefined' && messages && messages.warning) { %>
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <%= messages.warning %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- "success" dizisi varsa ve en az bir öğe varsa göster -->
+    <% if (typeof success !== 'undefined' && Array.isArray(success) && success.length > 0) { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= success[0] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- "error" dizisi varsa ve en az bir öğe varsa göster -->
+    <% if (typeof error !== 'undefined' && Array.isArray(error) && error.length > 0) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= error[0] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- Onaylanmamış psikolog uyarısı -->
+    <% if (user && user.role === 'psychologist' && user.isApproved === false) { %>
+      <div class="alert alert-primary border-0 shadow-sm" role="alert">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <i class="fas fa-user-graduate fa-2x text-primary"></i>
+          </div>
+          <div>
+            <h5 class="mb-1">Danışman Profil Hazırlığı</h5>
+            <p class="mb-2">
+              Sayın <%= user.name %>, hesabınız inceleme sürecindedir.<br>
+              Bu süreçte profilinizi tamamlayabilir ve platformun diğer özelliklerini keşfedebilirsiniz.
+            </p>
+            <div class="mt-2">
+              <small class="badge bg-info me-2">
+                <i class="fas fa-clock me-1"></i> Onay Bekleniyor
+              </small>
+              <small class="text-muted">
+                Onay sonrası tüm danışmanlık özelliklerine erişebilirsiniz
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Main Content -->
+  <main style="padding-top: 70px;">
+    <div class="container py-4">
+      <!-- Welcome Section -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card bg-gradient-primary text-white">
+            <div class="card-body d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <div class="me-4">
+                  <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" 
+                       style="width: 70px; height: 70px;">
+                    <i class="fas fa-user-md fa-2x text-white"></i>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="mb-1">Uzm. <%= user.name %></h3>
+                  <p class="mb-1 opacity-90">
+                    <% if (typeof user.specialization !== 'undefined') { %>
+                      <%= user.specialization %>
+                    <% } else { %>
+                      Psikoloji Danışmanı
+                    <% } %>
+                  </p>
+                  <p class="mb-0 small opacity-75">
+                    <i class="fas fa-calendar me-1"></i>
+                    Bugün 
+                    <% 
+                      const todayCount = appointments
+                        .filter(a => new Date(a.date).toDateString() === new Date().toDateString() && a.status === 'confirmed')
+                        .length;
+                    %>
+                    <%= todayCount %> randevunuz var
+                  </p>
+                </div>
+              </div>
+              <div class="text-end">
+                <% 
+                  const todayAppointments = appointments
+                    .filter(a => new Date(a.date).toDateString() === new Date().toDateString() && a.status === 'confirmed');
+                %>
+                <% if (todayAppointments.length > 0) { %>
+                  <div class="bg-white bg-opacity-20 rounded p-2">
+                    <small class="d-block text-white-50">Sonraki Randevu</small>
+                    <strong class="text-white"><%= todayAppointments[0].time %></strong>
+                  </div>
+                <% } else { %>
+                  <div class="bg-white bg-opacity-20 rounded p-2">
+                    <small class="text-white">Bugün randevu yok</small>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Stats Cards -->
+      <div class="row mb-4">
+        <% 
+          const stat = {
+            pending   : appointments.filter(a => a.status === 'pending').length,
+            confirmed : appointments.filter(a => a.status === 'confirmed').length,
+            completed : appointments.filter(a => a.status === 'completed').length,
+            activePts : [...new Set(appointments.map(a => a.patient.toString()))].length
+          };
+        %>
+        <div class="col-md-3 mb-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fas fa-hourglass-half fa-lg text-primary"></i>
+              </div>
+              <h4 class="text-primary mb-1"><%= stat.pending %></h4>
+              <small class="text-muted">Onay Bekleyen</small>
+              <% if (stat.pending > 0) { %>
+                <div class="mt-2"><span class="badge bg-warning-subtle text-warning">Acil</span></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fas fa-calendar-check fa-lg text-success"></i>
+              </div>
+              <h4 class="text-success mb-1"><%= stat.confirmed %></h4>
+              <small class="text-muted">Planlanmış Seanslar</small>
+              <% if (stat.confirmed > 0) { %>
+                <div class="mt-2"><span class="badge bg-success-subtle text-success">Bugün: <%= stat.confirmed %></span></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fas fa-clipboard-check fa-lg text-info"></i>
+              </div>
+              <h4 class="text-info mb-1"><%= stat.completed %></h4>
+              <small class="text-muted">Tamamlanan</small>
+              <% if (stat.completed > 0) { %>
+                <div class="mt-2"><span class="badge bg-info-subtle text-info">Bu hafta: <%= stat.completed %></span></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                   style="width: 60px; height: 60px;">
+                <i class="fas fa-users fa-lg text-warning"></i>
+              </div>
+              <h4 class="text-warning mb-1"><%= stat.activePts %></h4>
+              <small class="text-muted">Aktif Danışan</small>
+              <% if (stat.activePts > 0) { %>
+                <div class="mt-2"><span class="badge bg-warning-subtle text-warning">30 gün: <%= stat.activePts %></span></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointments Management -->
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Randevu Yönetimi</h5>
+            </div>
+            <div class="card-body">
+              <% if (appointments.length === 0) { %>
+                <div class="text-center py-4">
+                  <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                  <p class="text-muted">Henüz randevunuz bulunmuyor.</p>
+                </div>
+              <% } else { %>
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-3" id="appointmentTabs">
+                  <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending">
+                      <i class="fas fa-clock me-1"></i>
+                      Bekleyen (<%= stat.pending %>)
+                    </button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#confirmed">
+                      <i class="fas fa-check me-1"></i>
+                      Onaylı (<%= stat.confirmed %>)
+                    </button>
+                  </li>
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#completed">
+                      <i class="fas fa-check-circle me-1"></i>
+                      Tamamlanan (<%= stat.completed %>)
+                    </button>
+                  </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                  <!-- Pending -->
+                  <div class="tab-pane fade show active" id="pending">
+                    <% const pendingAppointments = appointments.filter(a => a.status === 'pending'); %>
+                    <% if (pendingAppointments.length === 0) { %>
+                      <p class="text-muted text-center">Bekleyen randevu yok.</p>
+                    <% } else { %>
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead class="table-light">
+                            <tr>
+                              <th>Hasta</th>
+                              <th>Tarih</th>
+                              <th>Saat</th>
+                              <th>Notlar</th>
+                              <th>İşlemler</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% pendingAppointments.forEach(appointment => { %>
+                              <tr>
+                                <td>
+                                  <div class="d-flex align-items-center">
+                                    <i class="fas fa-user me-2 text-primary"></i>
+                                    <div>
+                                      <strong><%= appointment.patient.name %></strong><br>
+                                      <small class="text-muted"><%= appointment.patient.email %></small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td><%= new Date(appointment.date).toLocaleDateString('tr-TR') %></td>
+                                <td><%= appointment.time %></td>
+                                <td>
+                                  <% if (appointment.notes) { %>
+                                    <small><%= appointment.notes.substring(0, 50) %>...</small>
+                                  <% } else { %>
+                                    <small class="text-muted">-</small>
+                                  <% } %>
+                                </td>
+                                <td>
+                                  <% if (!user.isApproved) { %>
+                                    <button class="btn btn-sm btn-secondary" disabled title="Onay bekleniyor">
+                                      <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary ms-1" disabled title="Onay bekleniyor">
+                                      <i class="fas fa-times"></i>
+                                    </button>
+                                  <% } else { %>
+                                    <form action="/appointments/<%= appointment._id %>/confirm" method="POST" class="d-inline">
+                                      <input type="hidden" name="_method" value="PUT">
+                                      <button class="btn btn-sm btn-success" title="Onayla">
+                                        <i class="fas fa-check"></i>
+                                      </button>
+                                    </form>
+                                    <form action="/appointments/<%= appointment._id %>" method="POST" class="d-inline ms-1">
+                                      <input type="hidden" name="_method" value="DELETE">
+                                      <button class="btn btn-sm btn-danger" title="Reddet">
+                                        <i class="fas fa-times"></i>
+                                      </button>
+                                    </form>
+                                  <% } %>
+                                </td>
+                              </tr>
+                            <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <!-- Confirmed -->
+                  <div class="tab-pane fade" id="confirmed">
+                    <% const confirmedAppointments = appointments.filter(a => a.status === 'confirmed'); %>
+                    <% if (confirmedAppointments.length === 0) { %>
+                      <p class="text-muted text-center">Onaylı randevu yok.</p>
+                    <% } else { %>
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead class="table-light">
+                            <tr>
+                              <th>Hasta</th>
+                              <th>Tarih</th>
+                              <th>Saat</th>
+                              <th>İşlemler</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% confirmedAppointments.forEach(appointment => { %>
+                              <tr>
+                                <td>
+                                  <div class="d-flex align-items-center">
+                                    <i class="fas fa-user me-2 text-success"></i>
+                                    <div>
+                                      <strong><%= appointment.patient.name %></strong><br>
+                                      <small class="text-muted"><%= appointment.patient.email %></small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td><%= new Date(appointment.date).toLocaleDateString('tr-TR') %></td>
+                                <td><%= appointment.time %></td>
+                                <td>
+                                  <% if (!user.isApproved) { %>
+                                    <button class="btn btn-sm btn-secondary" disabled title="Onay bekleniyor">
+                                      <i class="fas fa-comments"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary ms-1" disabled title="Onay bekleniyor">
+                                      <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary ms-1" disabled title="Onay bekleniyor">
+                                      <i class="fas fa-times"></i>
+                                    </button>
+                                  <% } else { %>
+                                    <a href="/messages/<%= appointment.patient._id %>" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       title="Mesaj Gönder">
+                                      <i class="fas fa-comments"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-success ms-1" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#completeModal_<%= appointment._id %>" 
+                                            title="Seansı Tamamla">
+                                      <i class="fas fa-check-double"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger ms-1" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#cancelModal_<%= appointment._id %>" 
+                                            title="Randevuyu İptal Et">
+                                      <i class="fas fa-times"></i>
+                                    </button>
+                                  <% } %>
+                                </td>
+                              </tr>
+
+                              <!-- Complete Session Modal -->
+                              <div class="modal fade" id="completeModal_<%= appointment._id %>" tabindex="-1">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title">
+                                        <i class="fas fa-check-double me-2 text-success"></i>
+                                        Seansı Tamamla
+                                      </h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="/appointments/<%= appointment._id %>/complete" method="POST">
+                                      <input type="hidden" name="_method" value="PUT">
+                                      <div class="modal-body">
+                                        <div class="alert alert-info mb-3">
+                                          <i class="fas fa-info-circle me-2"></i>
+                                          <strong>Seans Tamamlama İşlemi</strong><br>
+                                          Bu işlem gerçekleştirildikten sonra "completed" statüsüne geçer ve geri alınamaz.<br>
+                                          Lütfen seans notlarınızı detaylı yazın.
+                                        </div>
+                                        <div class="mb-3">
+                                          <label for="sessionNotes_<%= appointment._id %>" class="form-label">
+                                            <i class="fas fa-file-medical-alt me-1"></i>
+                                            Seans Notları *
+                                          </label>
+                                          <textarea class="form-control" 
+                                                    id="sessionNotes_<%= appointment._id %>" 
+                                                    name="sessionNotes" 
+                                                    rows="5" 
+                                                    required 
+                                                    placeholder="Örnek: Hasta bugün pozitif görünüyor...">
+                                          </textarea>
+                                          <div class="form-text">
+                                            Seans sırasında gözlemlenen durumlar, yapılan çalışmalar ve notlar
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                          <i class="fas fa-times me-1"></i> İptal
+                                        </button>
+                                        <button type="submit" class="btn btn-success">
+                                          <i class="fas fa-check-double me-1"></i> Tamamla
+                                        </button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Cancel Appointment Modal -->
+                              <div class="modal fade" id="cancelModal_<%= appointment._id %>" tabindex="-1">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header text-danger">
+                                      <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Randevuyu İptal Et
+                                      </h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="/appointments/<%= appointment._id %>" method="POST">
+                                      <input type="hidden" name="_method" value="DELETE">
+                                      <div class="modal-body">
+                                        <div class="alert alert-warning">
+                                          <i class="fas fa-exclamation-triangle me-2"></i>
+                                          <strong>Dikkat!</strong><br>
+                                          Bu randevuyu iptal etmek üzeresiniz. Geri alınamaz.
+                                        </div>
+                                        <div class="mb-3">
+                                          <strong>Randevu Bilgileri:</strong><br>
+                                          <i class="fas fa-user me-1 text-primary"></i> <%= appointment.patient.name %><br>
+                                          <i class="fas fa-calendar me-1 text-primary"></i> 
+                                          <%= new Date(appointment.date).toLocaleDateString('tr-TR') %><br>
+                                          <i class="fas fa-clock me-1 text-primary"></i> <%= appointment.time %>
+                                        </div>
+                                        <div class="mb-3">
+                                          <label for="cancelReason_<%= appointment._id %>" class="form-label">
+                                            <i class="fas fa-comment me-1"></i>
+                                            İptal Sebebi (İsteğe Bağlı)
+                                          </label>
+                                          <textarea class="form-control" 
+                                                    id="cancelReason_<%= appointment._id %>" 
+                                                    name="cancelReason" 
+                                                    rows="3" 
+                                                    placeholder="İptal sebebinizi yazabilirsiniz...">
+                                          </textarea>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                          <i class="fas fa-times me-1"></i> Vazgeç
+                                        </button>
+                                        <button type="submit" class="btn btn-danger">
+                                          <i class="fas fa-trash me-1"></i> İptal Et
+                                        </button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <!-- Completed -->
+                  <div class="tab-pane fade" id="completed">
+                    <% const completedAppointments = appointments.filter(a => a.status === 'completed'); %>
+                    <% if (completedAppointments.length === 0) { %>
+                      <p class="text-muted text-center">Tamamlanan seans yok.</p>
+                    <% } else { %>
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead class="table-light">
+                            <tr>
+                              <th>Hasta</th>
+                              <th>Tarih</th>
+                              <th>Saat</th>
+                              <th>Seans Notları</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% completedAppointments.forEach(appointment => { %>
+                              <tr>
+                                <td>
+                                  <div class="d-flex align-items-center">
+                                    <i class="fas fa-user me-2 text-info"></i>
+                                    <div>
+                                      <strong><%= appointment.patient.name %></strong><br>
+                                      <small class="text-muted"><%= appointment.patient.email %></small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td><%= new Date(appointment.date).toLocaleDateString('tr-TR') %></td>
+                                <td><%= appointment.time %></td>
+                                <td>
+                                  <% if (appointment.sessionNotes) { %>
+                                    <small><%= appointment.sessionNotes.substring(0, 100) %>...</small>
+                                  <% } else { %>
+                                    <small class="text-muted">Not bulunmuyor</small>
+                                  <% } %>
+                                </td>
+                              </tr>
+                            <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar (Bugünün Programı) -->
+        <div class="col-lg-4">
+          <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h6 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Bugünün Programı</h6>
+            </div>
+            <div class="card-body">
+              <% if (todayAppointments.length === 0) { %>
+                <div class="text-center py-3">
+                  <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                  <p class="text-muted mb-0">Bugün randevunuz yok</p>
+                  <small class="text-muted">Dinlenme ve planlama günü</small>
+                </div>
+              <% } else { %>
+                <% todayAppointments.forEach((apt, idx) => { %>
+                  <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                           style="width: 40px; height: 40px;">
+                        <span class="text-white fw-bold"><%= idx + 1 %></span>
+                      </div>
+                      <div>
+                        <strong class="text-primary"><%= apt.time %></strong><br>
+                        <small class="text-muted"><%= apt.patient.name %></small>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <span class="badge bg-success">Onaylı</span><br>
+                      <% 
+                        const nowTime = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                        if (nowTime > apt.time) { %>
+                          <small class="text-danger">Geçti</small>
+                      <% } else { %>
+                          <small class="text-success">Bekliyor</small>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-light py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Mindbridge</h5>
+          <p>Psikoloji danışmanlık platformu ile uzmanlarla güvenli iletişim kurun.</p>
+        </div>
+        <div class="col-md-6">
+          <h5>İletişim</h5>
+          <p><i class="fas fa-envelope me-2"></i>info@mindbridge.com</p>
+        </div>
+      </div>
+      <hr>
+      <div class="text-center">
+        <p>&copy; <%= new Date().getFullYear() %> Mindbridge. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle (JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="/js/app.js"></script>
+
+  <!-- Form submit koruma (isteğe bağlı) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+          const btn = this.querySelector('button[type="submit"]');
+          if (btn && !btn.disabled) {
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> İşleniyor...';
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerHTML = orig;
+            }, 10000);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

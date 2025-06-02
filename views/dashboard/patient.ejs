@@ -1,0 +1,297 @@
+<%- include('../partials/header', {
+    title: 'Hasta Dashboard',
+    currentPage: 'dashboard'
+}) %>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        <% if (typeof success !== 'undefined' && success.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        
+        <% if (typeof error !== 'undefined' && error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Main Content -->
+    <main style="padding-top: 70px;">
+        <div class="container py-4">
+            <!-- Welcome Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-user-circle fa-3x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="mb-1">Hoş geldiniz, <%= user.name %></h3>
+                                    <p class="mb-0">Zihin sağlığınız için buradayız. Size nasıl yardımcı olabiliriz?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-calendar-plus fa-2x text-primary mb-3"></i>
+                            <h6>Randevu Al</h6>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                Yeni Randevu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                            <h6>Danışmanlar</h6>
+                            <p class="text-muted small">Uzman danışmanları görüntüle</p>
+                            <a href="/psychologists" class="btn btn-primary btn-sm">Görüntüle</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-comments fa-2x text-info mb-3"></i>
+                            <h6>Mesajlar</h6>
+                            <a href="/messages" class="btn btn-info btn-sm">
+                                Sohbete Git
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-chart-line fa-2x text-warning mb-3"></i>
+                            <h6>İlerleme</h6>
+                            <a href="#" class="btn btn-warning btn-sm">
+                                Raporlar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Appointments Section -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Randevularım
+                            </h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                <i class="fas fa-plus me-1"></i>
+                                Yeni Randevu
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <% if (appointments.length === 0) { %>
+                                <div class="text-center py-4">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Henüz randevunuz bulunmuyor.</p>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                        İlk Randevunuzu Alın
+                                    </button>
+                                </div>
+                            <% } else { %>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Psikolog</th>
+                                                <th>Tarih</th>
+                                                <th>Saat</th>
+                                                <th>Durum</th>
+                                                <th>İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% appointments.forEach(appointment => { %>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-user-md me-2 text-primary"></i>
+                                                            <div>
+                                                                <strong><%= appointment.psychologist.name %></strong>
+                                                                <br>
+                                                                <small class="text-muted"><%= appointment.psychologist.specialization %></small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td><%= moment(appointment.date).format('DD/MM/YYYY') %></td>
+                                                    <td><%= appointment.time %></td>
+                                                    <td>
+                                                        <% if (appointment.status === 'pending') { %>
+                                                            <span class="badge bg-warning">Beklemede</span>
+                                                        <% } else if (appointment.status === 'confirmed') { %>
+                                                            <span class="badge bg-success">Onaylandı</span>
+                                                        <% } else if (appointment.status === 'completed') { %>
+                                                            <span class="badge bg-info">Tamamlandı</span>
+                                                        <% } else if (appointment.status === 'cancelled') { %>
+                                                            <span class="badge bg-danger">İptal Edildi</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (appointment.status === 'confirmed') { %>
+                                                            <a href="/messages/<%= appointment.psychologist._id %>" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fas fa-comments"></i>
+                                                            </a>
+                                                        <% } %>
+                                                        <% if (appointment.status === 'pending') { %>
+                                                            <button class="btn btn-sm btn-outline-danger">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Günün İpucu
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Düzenli meditasyon ve nefes egzersizleri, stress seviyenizi düşürmeye ve 
+                                zihinsel berraklığınızı artırmaya yardımcı olabilir.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-clock me-2"></i>
+                                Yaklaşan Randevular
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <% 
+                            const upcomingAppointments = appointments.filter(apt => 
+                                apt.status === 'confirmed' && moment(apt.date).isAfter(moment())
+                            ).slice(0, 3);
+                            %>
+                            
+                            <% if (upcomingAppointments.length === 0) { %>
+                                <p class="text-muted text-center">Yaklaşan randevu yok</p>
+                            <% } else { %>
+                                <% upcomingAppointments.forEach(appointment => { %>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <small class="text-muted">
+                                                <%= moment(appointment.date).format('DD MMM') %> - <%= appointment.time %>
+                                            </small>
+                                            <br>
+                                            <small><%= appointment.psychologist.name %></small>
+                                        </div>
+                                        <span class="badge bg-success">Onaylandı</span>
+                                    </div>
+                                    <hr>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Modal -->
+        <div class="modal fade" id="appointmentModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Yeni Randevu Al
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/appointments" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="psychologist" class="form-label">Psikolog Seçin</label>
+                                <select class="form-select" id="psychologist" name="psychologist" required>
+                                    <option value="">Psikolog seçiniz...</option>
+                                    <% psychologists.forEach(psychologist => { %>
+                                        <option value="<%= psychologist._id %>">
+                                            <%= psychologist.name %> - <%= psychologist.specialization %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="date" class="form-label">Tarih</label>
+                                    <input type="date" class="form-control" id="date" name="date" required
+                                           min="<%= moment().format('YYYY-MM-DD') %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="time" class="form-label">Saat</label>
+                                    <select class="form-select" id="time" name="time" required>
+                                        <option value="">Saat seçiniz...</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="17:00">17:00</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Notlar (Opsiyonel)</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3"
+                                          placeholder="Randevu ile ilgili özel notlarınız..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-check me-1"></i>
+                                Randevu Al
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<%- include('../partials/footer', {
+    additionalJS: '<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>'
+}) %> 

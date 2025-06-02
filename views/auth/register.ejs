@@ -1,0 +1,204 @@
+<%- include('../partials/header', {
+    title: 'Kayıt Ol - Mindbridge',
+    bodyClass: 'body-auth'
+    // currentPage: 'register', // Bu değişkenleri header partial'ınızda kullanıyorsanız ekleyebilirsiniz
+    // additionalCSS: [],
+    // additionalJS: []
+}) %>
+
+<body class="body-auth"> <span class="code-annotation"> </span>
+    
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow auth-card"> <span class="code-annotation"> </span>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-graduation-cap fa-3x auth-icon"></i> <span class="code-annotation"> </span>
+                            <h2 class="fw-bold">Kayıt Ol</h2>
+                            <p class="text-muted">Üniversite öğrencileri için psikoloji danışmanlık platformu</p>
+                        </div>
+
+                        <% if (typeof messages !== 'undefined') { %>
+                            <% if (messages.error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <%= messages.error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+                            <% if (messages.success) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <%= messages.success %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+                        <form action="/register" method="POST" id="registerForm">
+                            <div class="mb-4 role-selector">
+                                <label class="form-label d-block mb-2 text-center">Hesap Türü</label>
+                                <div class="row g-2 justify-content-center">
+                                    <div class="col-sm-5">
+                                        <input type="radio" class="btn-check" name="role" id="patient" value="patient" checked>
+                                        <label class="btn btn-outline-primary w-100" for="patient">
+                                            <i class="fas fa-graduation-cap d-block mb-1"></i>
+                                            Öğrenci
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <input type="radio" class="btn-check" name="role" id="psychologist" value="psychologist">
+                                        <label class="btn btn-outline-primary w-100" for="psychologist">
+                                            <i class="fas fa-user-md d-block mb-1"></i>
+                                            Danışman
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="psychologistWarning" class="alert alert-info mt-3 p-2" style="display: none;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-info-circle me-2 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1 small fw-bold">Danışman Hesabı Onay Süreci</h6>
+                                            <p class="mb-0 small text-muted">
+                                                Danışman hesabınız kayıt olduktan sonra <strong>admin onayı bekleyecektir</strong>.
+                                                Onay sürecinde sisteme giriş yapabilir ancak öğrenciler ile mesajlaşamazsınız.
+                                                Onay aldıktan sonra tüm özellikleri kullanabilirsiniz.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Ad Soyad</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">E-posta</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Şifre</label>
+                                    <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Telefon</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                            </div>
+
+                            <div id="psychologistFields" style="display: none;">
+                                <h5 class="text-primary mb-3 mt-4">Profesyonel Bilgiler</h5>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="specialization" class="form-label">Uzmanlık Alanı</label>
+                                        <select class="form-select" id="specialization" name="specialization">
+                                            <option value="">Seçiniz</option>
+                                            <option value="Üniversite Uyum Danışmanlığı">Üniversite Uyum Danışmanlığı</option>
+                                            <option value="Akademik Stres ve Kaygı">Akademik Stres ve Kaygı</option>
+                                            <option value="Sosyal İlişkiler ve İletişim">Sosyal İlişkiler ve İletişim</option>
+                                            <option value="Kariyer Danışmanlığı">Kariyer Danışmanlığı</option>
+                                            <option value="Kişisel Gelişim">Kişisel Gelişim</option>
+                                            <option value="İlişki Danışmanlığı">İlişki Danışmanlığı</option>
+                                            <option value="Duygusal Destek">Duygusal Destek</option>
+                                            <option value="Aile İlişkileri">Aile İlişkileri</option>
+                                            <option value="Zaman Yönetimi">Zaman Yönetimi</option>
+                                            <option value="Motivasyon ve Hedef Belirleme">Motivasyon ve Hedef Belirleme</option>
+                                            <option value="Klinik Psikoloji">Klinik Psikoloji</option>
+                                            <option value="Bilişsel Davranışçı Terapi">Bilişsel Davranışçı Terapi</option>
+                                            <option value="4. Sınıf Psikoloji Öğrencisi">4. Sınıf Psikoloji Öğrencisi</option>
+                                            <option value="Diğer">Diğer</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="experience" class="form-label">Deneyim (Yıl)</label>
+                                        <input type="number" class="form-control" id="experience" name="experience" min="0" max="50" placeholder="0 (Öğrenci ise)">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="license" class="form-label">Lisans/Öğrenci Numarası</label>
+                                    <input type="text" class="form-control" id="license" name="license"
+                                           placeholder="Psikoloji lisans numaranızı veya öğrenci numaranızı giriniz">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="bio" class="form-label">Hakkınızda (Opsiyonel)</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="3"
+                                          placeholder="Kendiniz hakkında kısa bilgi..."></textarea>
+                            </div>
+
+                            <div class="mb-3 auth-links">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        <a href="#" class="text-decoration-none">Kullanım Şartları</a> ve
+                                        <a href="#" class="text-decoration-none">Gizlilik Politikası</a>'nı kabul ediyorum
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Kayıt Ol
+                                </button>
+                            </div>
+
+                            <div class="text-center auth-links">
+                                <p class="mb-0">
+                                    Zaten hesabınız var mı?
+                                    <a href="/login" class="text-decoration-none">Giriş Yapın</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleInputs = document.querySelectorAll('input[name="role"]');
+        const psychologistFields = document.getElementById('psychologistFields');
+        const psychologistWarning = document.getElementById('psychologistWarning');
+        const specInput = document.getElementById('specialization');
+        const expInput = document.getElementById('experience');
+        const licInput = document.getElementById('license');
+
+        function togglePsychologistFields() {
+            const selectedRole = document.querySelector('input[name="role"]:checked').value;
+
+            if (selectedRole === 'psychologist') {
+                psychologistFields.style.display = 'block';
+                psychologistWarning.style.display = 'block';
+                if(specInput) specInput.required = true;
+                if(expInput) expInput.required = true;
+                if(licInput) licInput.required = true;
+            } else {
+                psychologistFields.style.display = 'none';
+                psychologistWarning.style.display = 'none';
+                if(specInput) specInput.required = false;
+                if(expInput) expInput.required = false;
+                if(licInput) licInput.required = false;
+            }
+        }
+
+        roleInputs.forEach(input => {
+            input.addEventListener('change', togglePsychologistFields);
+        });
+        togglePsychologistFields();
+    });
+    </script>
+
+<%- include('../partials/footer') %>

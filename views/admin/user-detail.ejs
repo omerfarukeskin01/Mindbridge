@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Detayı - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .stat-card {
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar min-vh-100 p-3">
+                    <div class="text-center text-white mb-4">
+                        <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                        <h5>Admin Panel</h5>
+                        <small><%= admin.name %></small>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        <a class="nav-link rounded mb-2" href="/admin/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                        <a class="nav-link rounded mb-2" href="/admin/pending-psychologists">
+                            <i class="fas fa-user-clock me-2"></i>
+                            Psikolog Onayları
+                        </a>
+                        <a class="nav-link active rounded mb-2" href="/admin/users">
+                            <i class="fas fa-users me-2"></i>
+                            Kullanıcı Yönetimi
+                        </a>
+                        <hr class="text-white">
+                        <a class="nav-link rounded text-warning" href="/admin/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Çıkış Yap
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 fw-bold">
+                            <i class="fas fa-user text-primary me-2"></i>
+                            Kullanıcı Detayı
+                        </h1>
+                        <div class="d-flex gap-2">
+                            <a href="/admin/users/<%= user._id %>/edit" class="btn btn-warning">
+                                <i class="fas fa-edit me-2"></i>
+                                Düzenle
+                            </a>
+                            <a href="/admin/users" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Geri Dön
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Flash Messages -->
+                    <% if (typeof messages !== 'undefined') { %>
+                        <% if (messages.error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <%= messages.error %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                        <% if (messages.success) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <%= messages.success %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                    <% } %>
+
+                    <!-- User Info Card -->
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-<%= user.role === 'psychologist' ? 'success' : 'info' %> text-white">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-<%= user.role === 'psychologist' ? 'user-md' : 'user' %> text-<%= user.role === 'psychologist' ? 'success' : 'info' %> fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1"><%= user.name %></h5>
+                                            <span class="badge bg-light text-dark">
+                                                <%= user.role === 'psychologist' ? 'Psikolog' : 'Hasta' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted mb-3">Temel Bilgiler</h6>
+                                            <p><strong>E-posta:</strong> <%= user.email %></p>
+                                            <% if (user.phone) { %>
+                                                <p><strong>Telefon:</strong> <%= user.phone %></p>
+                                            <% } %>
+                                            <p><strong>Kayıt Tarihi:</strong> <%= moment(user.createdAt).format('DD/MM/YYYY HH:mm') %></p>
+                                            <p><strong>Durum:</strong> 
+                                                <% if (user.role === 'psychologist') { %>
+                                                    <% if (user.isApproved) { %>
+                                                        <span class="badge bg-success">Onaylı</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-warning">Onay Bekliyor</span>
+                                                    <% } %>
+                                                <% } else { %>
+                                                    <span class="badge bg-success">Aktif</span>
+                                                <% } %>
+                                            </p>
+                                        </div>
+                                        
+                                        <% if (user.role === 'psychologist') { %>
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted mb-3">Psikolog Bilgileri</h6>
+                                                <p><strong>Uzmanlık:</strong> <%= user.specialization %></p>
+                                                <p><strong>Deneyim:</strong> <%= user.experience %> yıl</p>
+                                                <p><strong>Lisans No:</strong> <%= user.license %></p>
+                                                <% if (user.bio) { %>
+                                                    <p><strong>Hakkında:</strong></p>
+                                                    <p class="text-muted"><%= user.bio %></p>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Statistics Cards -->
+                        <div class="col-lg-4">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="card stat-card border-0 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="fas fa-calendar text-white"></i>
+                                            </div>
+                                            <h4 class="fw-bold"><%= appointments.length %></h4>
+                                            <p class="text-muted mb-0">Toplam Randevu</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="card stat-card border-0 shadow-sm">
+                                        <div class="card-body text-center">
+                                            <div class="bg-info rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="fas fa-comments text-white"></i>
+                                            </div>
+                                            <h4 class="fw-bold"><%= messageCount %></h4>
+                                            <p class="text-muted mb-0">Toplam Mesaj</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointments -->
+                    <% if (appointments && appointments.length > 0) { %>
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    Randevular (<%= appointments.length %>)
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tarih & Saat</th>
+                                                <th><%= user.role === 'psychologist' ? 'Hasta' : 'Psikolog' %></th>
+                                                <th>Durum</th>
+                                                <th>Oluşturulma</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% appointments.forEach(appointment => { %>
+                                                <tr>
+                                                    <td>
+                                                        <strong><%= moment(appointment.date).format('DD/MM/YYYY') %></strong>
+                                                        <br>
+                                                        <small class="text-muted"><%= appointment.time %></small>
+                                                    </td>
+                                                    <td>
+                                                        <% if (user.role === 'psychologist') { %>
+                                                            <%= appointment.patient.name %>
+                                                            <br>
+                                                            <small class="text-muted"><%= appointment.patient.email %></small>
+                                                        <% } else { %>
+                                                            <%= appointment.psychologist.name %>
+                                                            <br>
+                                                            <small class="text-muted"><%= appointment.psychologist.email %></small>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (appointment.status === 'pending') { %>
+                                                            <span class="badge bg-warning">Bekliyor</span>
+                                                        <% } else if (appointment.status === 'confirmed') { %>
+                                                            <span class="badge bg-success">Onaylandı</span>
+                                                        <% } else if (appointment.status === 'completed') { %>
+                                                            <span class="badge bg-primary">Tamamlandı</span>
+                                                        <% } else if (appointment.status === 'cancelled') { %>
+                                                            <span class="badge bg-danger">İptal</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <small>
+                                                            <%= moment(appointment.createdAt).format('DD/MM/YYYY') %>
+                                                            <br>
+                                                            <span class="text-muted">
+                                                                <%= moment(appointment.createdAt).format('HH:mm') %>
+                                                            </span>
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="card shadow-sm">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Henüz randevu yok</h5>
+                                <p class="text-muted">Bu kullanıcının henüz hiç randevusu bulunmuyor.</p>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,105 @@
+<%- include('../partials/header', {
+    title: 'Giriş Yap',
+    bodyClass: 'body-auth'
+}) %>
+
+    <div class="container py-5" style="padding-top: 100px !important;">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow auth-card"> <span class="code-annotation"> </span>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-brain fa-3x auth-icon"></i> <span class="code-annotation"> </span>
+                            <h2 class="fw-bold">Giriş Yap</h2>
+                            <p class="text-muted">Mindbridge hesabınıza giriş yapın</p>
+                        </div>
+
+                        <% if (typeof messages !== 'undefined') { %>
+                            <% if (messages.error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <%= messages.error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+                            <% if (messages.success) { %>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <%= messages.success %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+                        <form action="/login" method="POST">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">E-posta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Şifre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    Giriş Yap
+                                </button>
+                            </div>
+
+                            <div class="text-center auth-links">
+                                <p class="mb-0">
+                                    Hesabınız yok mu?
+                                    <a href="/register" class="text-decoration-none">Kayıt Olun</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <% if (typeof showPsychologistInfo !== 'undefined' && showPsychologistInfo) { %>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card border-warning bg-warning bg-opacity-10">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-user-md fa-2x text-warning me-3 mt-1"></i>
+                                    <div>
+                                        <h5 class="mb-2 text-warning fw-bold">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Psikolog Hesabı Onayı
+                                        </h5>
+                                        <p class="mb-0">
+                                            Psikolog hesabınız henüz onaylanmadıysa, sisteme giriş yapabilir ancak
+                                            <strong>hasta ile mesajlaşamazsınız</strong>. Admin onayından sonra tüm özellikleri kullanabilirsiniz.
+                                        </p>
+                                        <div class="alert alert-warning mt-2 mb-0 py-2" role="alert">
+                                            <small>
+                                                <i class="fas fa-clock me-1"></i>
+                                                Onay süreci genellikle 24-48 saat içinde tamamlanır.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+<%- include('../partials/footer') %>
