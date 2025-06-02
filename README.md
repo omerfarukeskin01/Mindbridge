@@ -291,17 +291,3 @@ Uygulama tüm cihaz türlerinde mükemmel çalışır:
 ## 📄 Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır.
-
-
-## 🙏 Teşekkürler
-
-Bu projeyi geliştirmek için kullanılan açık kaynak teknolojilere teşekkürler:
-- Express.js ekibi
-- MongoDB ekibi
-- Socket.io ekibi
-- Bootstrap ekibi
-- Tüm katkıda bulunanlar
-
----
-
-**Mindbridge** - Modern mimari ile zihin sağlığınız için güvenilir köprü 🧠💙✨ 
