@@ -110,7 +110,7 @@ mindbridge/
 
 ### 1. Projeyi Klonlayın
 ```bash
-git clone <repository-url>
+git clone https://github.com/omerfarukeskin01/Mindbridge
 cd mindbridge
 ```
 
