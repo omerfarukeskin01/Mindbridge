@@ -35,6 +35,14 @@ class MessageController {
                 return res.redirect('/dashboard');
             }
             
+            // Apply privacy settings if current user is psychologist and other user is patient
+            if (req.session.user.role === 'psychologist' && otherUser.role === 'patient') {
+                if (otherUser.shareNameWithPsychologist === false) {
+                    otherUser.name = `Anonim Hasta #${otherUser._id.toString().slice(-6)}`;
+                    otherUser.email = `anonim.hasta.${otherUser._id.toString().slice(-6)}@gizli.com`;
+                }
+            }
+            
             // Get conversation history
             const messages = await MessageController.getConversationHistory(
                 currentUserId, 
@@ -74,16 +82,35 @@ class MessageController {
     // Get conversation history between two users
     static async getConversationHistory(userId1, userId2, limit = 50) {
         try {
-            return await Message.find({
+            const messages = await Message.find({
                 $or: [
                     { sender: userId1, receiver: userId2 },
                     { sender: userId2, receiver: userId1 }
                 ]
             })
-            .populate('sender receiver', 'name')
+            .populate('sender receiver', 'name role shareNameWithPsychologist')
             .sort({ createdAt: 1 })
             .limit(limit)
             .exec();
+            
+            // Apply privacy settings
+            return messages.map(message => {
+                // If sender is patient and receiver is psychologist, check privacy
+                if (message.sender.role === 'patient' && message.receiver.role === 'psychologist') {
+                    if (message.sender.shareNameWithPsychologist === false) {
+                        message.sender.name = `Anonim Hasta #${message.sender._id.toString().slice(-6)}`;
+                        message.sender.email = `anonim.hasta.${message.sender._id.toString().slice(-6)}@gizli.com`;
+                    }
+                }
+                // If receiver is patient and sender is psychologist, check privacy
+                if (message.receiver.role === 'patient' && message.sender.role === 'psychologist') {
+                    if (message.receiver.shareNameWithPsychologist === false) {
+                        message.receiver.name = `Anonim Hasta #${message.receiver._id.toString().slice(-6)}`;
+                        message.receiver.email = `anonim.hasta.${message.receiver._id.toString().slice(-6)}@gizli.com`;
+                    }
+                }
+                return message;
+            });
         } catch (error) {
             console.error('Get conversation history error:', error);
             return [];
@@ -137,10 +164,37 @@ class MessageController {
 
             // Populate user details
             await Message.populate(conversations, [
-                { path: '_id', select: 'name role' },
-                { path: 'lastMessage.sender', select: 'name' },
-                { path: 'lastMessage.receiver', select: 'name' }
+                { path: '_id', select: 'name role email shareNameWithPsychologist' },
+                { path: 'lastMessage.sender', select: 'name email role shareNameWithPsychologist' },
+                { path: 'lastMessage.receiver', select: 'name email role shareNameWithPsychologist' }
             ]);
+            
+            // Apply privacy settings to conversations
+            conversations.forEach(conversation => {
+                // Check if the other user is a patient and current user is psychologist
+                if (conversation._id && conversation._id.role === 'patient' && 
+                    conversation._id.shareNameWithPsychologist === false) {
+                    conversation._id.name = `Anonim Hasta #${conversation._id._id.toString().slice(-6)}`;
+                    conversation._id.email = `anonim.hasta.${conversation._id._id.toString().slice(-6)}@gizli.com`;
+                }
+                
+                // Apply privacy to last message sender/receiver
+                if (conversation.lastMessage) {
+                    if (conversation.lastMessage.sender && 
+                        conversation.lastMessage.sender.role === 'patient' && 
+                        conversation.lastMessage.sender.shareNameWithPsychologist === false) {
+                        conversation.lastMessage.sender.name = `Anonim Hasta #${conversation.lastMessage.sender._id.toString().slice(-6)}`;
+                        conversation.lastMessage.sender.email = `anonim.hasta.${conversation.lastMessage.sender._id.toString().slice(-6)}@gizli.com`;
+                    }
+                    
+                    if (conversation.lastMessage.receiver && 
+                        conversation.lastMessage.receiver.role === 'patient' && 
+                        conversation.lastMessage.receiver.shareNameWithPsychologist === false) {
+                        conversation.lastMessage.receiver.name = `Anonim Hasta #${conversation.lastMessage.receiver._id.toString().slice(-6)}`;
+                        conversation.lastMessage.receiver.email = `anonim.hasta.${conversation.lastMessage.receiver._id.toString().slice(-6)}@gizli.com`;
+                    }
+                }
+            });
 
             return conversations;
         } catch (error) {

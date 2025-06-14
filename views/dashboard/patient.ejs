@@ -89,6 +89,22 @@
                 </div>
             </div>
             
+            <!-- Second Row -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <i class="fas fa-book fa-2x text-success mb-3"></i>
+                            <h6>Kaynak Kütüphanesi</h6>
+                            <p class="text-muted small">Faydalı yazılar ve kaynaklar</p>
+                            <a href="/resources" class="btn btn-success btn-sm">
+                                Kaynakları Gör
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Appointments Section -->
             <div class="row">
                 <div class="col-lg-8">
@@ -217,6 +233,35 @@
                         </div>
                     </div>
                     
+                    <!-- Privacy Settings -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-user-shield me-2"></i>
+                                Gizlilik Ayarları
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>İsim Paylaşımı</strong>
+                                    <br>
+                                    <small class="text-muted">Psikologlarla isminizi paylaşın</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="shareNameToggle" 
+                                           <%= user.shareNameWithPsychologist !== false ? 'checked' : '' %>
+                                           onchange="toggleNameSharing(this.checked)">
+                                </div>
+                            </div>
+                            <hr>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Kapalı olduğunda psikologlar sizi "Anonim Hasta" olarak görecek.
+                            </small>
+                        </div>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <h6 class="mb-0">
@@ -322,7 +367,7 @@
 
 <%- include('../partials/footer', {
     additionalJS: '<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>'
-}) %>
+}) %> 
 
 <script>
 // Mood Widget JavaScript
@@ -431,6 +476,75 @@ function displayMoodWidget(dailyData, weeklyData) {
     }
     
     widget.innerHTML = html;
+}
+
+// Privacy Settings JavaScript
+async function toggleNameSharing(isEnabled) {
+    try {
+        const response = await fetch('/api/user/privacy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                shareNameWithPsychologist: isEnabled
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show success message
+            showToast(isEnabled ? 'İsim paylaşımı açıldı' : 'İsim paylaşımı kapatıldı', 'success');
+        } else {
+            // Revert toggle on error
+            document.getElementById('shareNameToggle').checked = !isEnabled;
+            showToast('Ayar güncellenirken hata oluştu', 'error');
+        }
+    } catch (error) {
+        console.error('Privacy toggle error:', error);
+        // Revert toggle on error
+        document.getElementById('shareNameToggle').checked = !isEnabled;
+        showToast('Bağlantı hatası', 'error');
+    }
+}
+
+function showToast(message, type) {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Add toast
+    const toastElement = document.createElement('div');
+    toastElement.innerHTML = toastHtml;
+    toastContainer.appendChild(toastElement.firstElementChild);
+    
+    // Show toast
+    const toast = new bootstrap.Toast(toastContainer.lastElementChild);
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastContainer.lastElementChild.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
 }
 </script>
 

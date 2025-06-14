@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema({
       return this.role === 'patient';
     }
   },
+  shareNameWithPsychologist: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

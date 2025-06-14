@@ -248,6 +248,12 @@ exports.getPatientMoodForPsychologist = async (req, res) => {
     }).sort({ date: -1 });
 
     const patient = await User.findById(patientId);
+    
+    // Apply privacy settings
+    if (patient && patient.shareNameWithPsychologist === false) {
+      patient.name = `Anonim Hasta #${patient._id.toString().slice(-6)}`;
+      patient.email = `anonim.hasta.${patient._id.toString().slice(-6)}@gizli.com`;
+    }
 
     res.render('mood/patient-mood-view', {
       title: 'Hasta Ruh Hali Takibi',
@@ -269,7 +275,7 @@ exports.getAppointmentPatientsMood = async (req, res) => {
     const appointments = await Appointment.find({
       psychologist: req.session.user.id,
       status: { $in: ['confirmed', 'completed'] }
-    }).populate('patient', 'name email');
+    }).populate('patient', 'name email shareNameWithPsychologist');
 
     // Benzersiz hasta ID'lerini al (aynı hasta birden fazla randevusu olabilir)
     const uniquePatientIds = [...new Set(appointments.map(app => app.patient._id.toString()))];
@@ -284,6 +290,12 @@ exports.getAppointmentPatientsMood = async (req, res) => {
       const patient = appointments.find(app => 
         app.patient._id.toString() === patientId
       ).patient;
+      
+      // Apply privacy settings
+      if (patient && patient.shareNameWithPsychologist === false) {
+        patient.name = `Anonim Hasta #${patient._id.toString().slice(-6)}`;
+        patient.email = `anonim.hasta.${patient._id.toString().slice(-6)}@gizli.com`;
+      }
 
       patientMoods.push({
         patient,

@@ -38,6 +38,12 @@ class DashboardController {
       const messages = (req.flash('messages') || [])[0] || {}; 
       // (mesela req.flash('messages', { warning: '...' }) demişsen)
 
+      // Update session with latest user data including privacy settings
+      req.session.user = {
+        ...req.session.user,
+        shareNameWithPsychologist: user.shareNameWithPsychologist
+      };
+
       return res.render('dashboard/patient', {
         user,
         appointments,

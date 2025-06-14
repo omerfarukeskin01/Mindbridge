@@ -24,9 +24,18 @@ class AppointmentService {
 
   static async getPsychologistAppointments(psychologistId) {
     try {
-      return await Appointment.find({ psychologist: psychologistId })
-        .populate('patient', 'name email')
+      const appointments = await Appointment.find({ psychologist: psychologistId })
+        .populate('patient', 'name email shareNameWithPsychologist')
         .sort({ date: 1 });
+      
+      // Apply privacy settings
+      return appointments.map(appointment => {
+        if (appointment.patient && appointment.patient.shareNameWithPsychologist === false) {
+          appointment.patient.name = `Anonim Hasta #${appointment.patient._id.toString().slice(-6)}`;
+          appointment.patient.email = `anonim.hasta.${appointment.patient._id.toString().slice(-6)}@gizli.com`;
+        }
+        return appointment;
+      });
     } catch (error) {
       console.error('Get psychologist appointments error:', error);
       return [];
@@ -35,9 +44,17 @@ class AppointmentService {
 
   static async getAppointmentById(appointmentId) {
     try {
-      return await Appointment.findById(appointmentId)
-        .populate('patient', 'name email')
+      const appointment = await Appointment.findById(appointmentId)
+        .populate('patient', 'name email shareNameWithPsychologist')
         .populate('psychologist', 'name specialization');
+      
+      // Apply privacy settings
+      if (appointment && appointment.patient && appointment.patient.shareNameWithPsychologist === false) {
+        appointment.patient.name = `Anonim Hasta #${appointment.patient._id.toString().slice(-6)}`;
+        appointment.patient.email = `anonim.hasta.${appointment.patient._id.toString().slice(-6)}@gizli.com`;
+      }
+      
+      return appointment;
     } catch (error) {
       console.error('Get appointment by id error:', error);
       return null;
@@ -107,10 +124,19 @@ class AppointmentService {
         query.status = filters.status;
       }
 
-      return await Appointment.find(query)
-        .populate('patient', 'name email')
+      const appointments = await Appointment.find(query)
+        .populate('patient', 'name email shareNameWithPsychologist')
         .populate('psychologist', 'name specialization')
         .sort({ date: 1 });
+      
+      // Apply privacy settings
+      return appointments.map(appointment => {
+        if (appointment.patient && appointment.patient.shareNameWithPsychologist === false) {
+          appointment.patient.name = `Anonim Hasta #${appointment.patient._id.toString().slice(-6)}`;
+          appointment.patient.email = `anonim.hasta.${appointment.patient._id.toString().slice(-6)}@gizli.com`;
+        }
+        return appointment;
+      });
     } catch (error) {
       console.error('Get appointments by date range error:', error);
       return [];

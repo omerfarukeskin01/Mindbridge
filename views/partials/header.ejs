@@ -85,6 +85,11 @@
                 </a>
               </li>
             <% } %>
+            <li class="nav-item">
+              <a class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'resources' ? 'active' : '' %>" href="/resources">
+                <i class="fas fa-book me-1"></i>Kaynak Kütüphanesi
+              </a>
+            </li>
           <% } else { %>
             <li class="nav-item">
               <a class="nav-link" href="/psychologists">
@@ -107,18 +112,6 @@
                 <li><h6 class="dropdown-header">
                   <%= user.role === 'patient' ? 'Hasta' : user.role === 'psychologist' ? 'Psikolog' : 'Kullanıcı' %>
                 </h6></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/profile">
-                  <i class="fas fa-user me-2"></i>Profil
-                </a></li>
-                <% if (user.role === 'patient') { %>
-                  <li><a class="dropdown-item" href="/appointments">
-                    <i class="fas fa-calendar me-2"></i>Randevularım
-                  </a></li>
-                <% } %>
-                <li><a class="dropdown-item" href="/settings">
-                  <i class="fas fa-cog me-2"></i>Ayarlar
-                </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item text-danger" href="/logout">
                   <i class="fas fa-sign-out-alt me-2"></i>Çıkış
