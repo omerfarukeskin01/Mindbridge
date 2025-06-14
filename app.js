@@ -16,6 +16,7 @@ const SocketConfig = require('./config/socketConfig');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const moodRoutes = require('./routes/moodRoutes');
 
 // Import controllers
 const appointmentController = require('./controllers/appointmentController');
@@ -160,6 +161,7 @@ app.get('/', (req, res) => {
 app.use('/', authRoutes);
 app.use('/', dashboardRoutes);
 app.use('/', adminRoutes);
+app.use('/mood', moodRoutes);
 
 // Appointment routes
 app.post('/appointments', requireAuth, requirePatient, appointmentController.createAppointment);

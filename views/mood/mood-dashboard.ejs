@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruh Hali Takibi - Mindbridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .mood-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <!-- Başlık -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="fw-bold text-primary mb-1">
+        <i class="fas fa-heart me-2"></i>Ruh Hali Takibi
+      </h2>
+      <p class="text-muted">Günlük ruh halinizi takip edin ve trendlerinizi analiz edin</p>
+    </div>
+  </div>
+
+  <!-- Hızlı Aksiyonlar -->
+  <div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fas fa-plus text-primary fs-4"></i>
+          </div>
+          <h5 class="card-title">Yeni Kayıt</h5>
+          <p class="card-text text-muted small">Bugünkü ruh halinizi kaydedin</p>
+          <a href="/mood/entry" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i>Kayıt Ekle
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fas fa-history text-info fs-4"></i>
+          </div>
+          <h5 class="card-title">Geçmiş</h5>
+          <p class="card-text text-muted small">Önceki kayıtlarınızı görün</p>
+          <a href="/mood/history" class="btn btn-info btn-sm">
+            <i class="fas fa-history me-1"></i>Geçmişi Gör
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fas fa-chart-line text-success fs-4"></i>
+          </div>
+          <h5 class="card-title">Analiz</h5>
+          <p class="card-text text-muted small">Trendlerinizi inceleyin</p>
+          <a href="/mood/analytics" class="btn btn-success btn-sm">
+            <i class="fas fa-chart-line me-1"></i>Analiz Et
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fas fa-calendar-alt text-warning fs-4"></i>
+          </div>
+          <h5 class="card-title">Takvim</h5>
+          <p class="card-text text-muted small">Aylık görünüm</p>
+          <a href="/mood/calendar" class="btn btn-warning btn-sm">
+            <i class="fas fa-calendar-alt me-1"></i>Takvimi Gör
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- İstatistikler -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pb-0">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-chart-bar me-2 text-primary"></i>Hızlı İstatistikler
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6 col-md-3">
+              <div class="border-end">
+                <h3 class="text-primary mb-1" id="total-entries">-</h3>
+                <small class="text-muted">Toplam Kayıt</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="border-end">
+                <h3 class="text-success mb-1" id="avg-mood">-</h3>
+                <small class="text-muted">Ortalama Mood</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="border-end">
+                <h3 class="text-info mb-1" id="this-week">-</h3>
+                <small class="text-muted">Bu Hafta</small>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <h3 class="text-warning mb-1" id="streak">-</h3>
+              <small class="text-muted">Seri</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Son Kayıtlar -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-clock me-2 text-primary"></i>Son Kayıtlar
+          </h5>
+          <a href="/mood/history" class="btn btn-outline-primary btn-sm">
+            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body">
+          <div id="recent-moods">
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  loadDashboardData();
+});
+
+function checkTodayMood() {
+  fetch('/mood/api/daily')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.todayMood) {
+        document.getElementById('today-status').textContent = 
+          `Bugün: ${data.todayMood.moodLevel}/10`;
+      } else {
+        document.getElementById('today-status').textContent = 'Henüz kayıt yok';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      document.getElementById('today-status').textContent = 'Hata oluştu';
+    });
+}
+
+function loadDashboardData() {
+  // Bugünkü mood kontrolü
+  checkTodayMood();
+  
+  // Aylık rapor
+  fetch('/mood/api/monthly')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('total-entries').textContent = data.totalEntries;
+        document.getElementById('avg-mood').textContent = data.avgMood;
+      }
+    })
+    .catch(error => console.error('Monthly data error:', error));
+    
+  // Haftalık trend
+  fetch('/mood/api/weekly')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('this-week').textContent = data.weeklyMoods.length;
+      }
+    })
+    .catch(error => console.error('Weekly data error:', error));
+    
+  // Son kayıtları yükle
+  loadRecentMoods();
+}
+
+function loadRecentMoods() {
+  fetch('/mood/api/range?days=7')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.moods.length > 0) {
+        displayRecentMoods(data.moods.slice(-5)); // Son 5 kayıt
+      } else {
+        document.getElementById('recent-moods').innerHTML = 
+          '<p class="text-muted text-center">Henüz kayıt yok</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Recent moods error:', error);
+      document.getElementById('recent-moods').innerHTML = 
+        '<p class="text-danger text-center">Veriler yüklenemedi</p>';
+    });
+}
+
+function displayRecentMoods(moods) {
+  const container = document.getElementById('recent-moods');
+  let html = '';
+  
+  moods.reverse().forEach(mood => {
+    const date = new Date(mood.date);
+    const isToday = date.toDateString() === new Date().toDateString();
+    const timeStr = isToday ? 
+      'Bugün ' + date.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}) :
+      date.toLocaleDateString('tr-TR', {day: '2-digit', month: '2-digit'}) + ' ' + 
+      date.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+    
+    let moodColor = '';
+    if (mood.moodLevel <= 3) moodColor = 'danger';
+    else if (mood.moodLevel <= 6) moodColor = 'warning';
+    else if (mood.moodLevel <= 8) moodColor = 'success';
+    else moodColor = 'primary';
+    
+    html += `
+      <div class="d-flex align-items-center mb-3 p-2 rounded bg-light">
+        <div class="mood-circle bg-${moodColor} me-3">
+          ${mood.moodLevel}
+        </div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold">${mood.moodLevel}/10</div>
+          <small class="text-muted">${timeStr}</small>
+          ${mood.emotions && mood.emotions.length > 0 ? 
+            `<div><small class="text-info">${mood.emotions.join(', ')}</small></div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

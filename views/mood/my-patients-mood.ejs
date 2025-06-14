@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hastalarım - Ruh Hali Durumu - Mindbridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-fluid py-4">
+  <!-- Başlık -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="fw-bold text-primary mb-1">
+            <i class="fas fa-users me-2"></i>Hastalarım - Ruh Hali Durumu
+          </h2>
+          <p class="text-muted">Randevusu olan hastalarınızın mood takibi</p>
+        </div>
+        <div>
+          <a href="/dashboard" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Dashboard'a Dön
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- İstatistik Kartları -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center h-100">
+        <div class="card-body">
+          <div class="text-primary mb-2">
+            <i class="fas fa-user-friends" style="font-size: 2.5rem;"></i>
+          </div>
+          <h3 class="text-primary mb-1"><%= patientMoods.length %></h3>
+          <small class="text-muted">Toplam Hasta</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center h-100">
+        <div class="card-body">
+          <div class="text-success mb-2">
+            <i class="fas fa-smile" style="font-size: 2.5rem;"></i>
+          </div>
+          <h3 class="text-success mb-1">
+            <%= patientMoods.filter(p => p.lastMood && p.lastMood.moodLevel >= 7).length %>
+          </h3>
+          <small class="text-muted">İyi Durumda</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center h-100">
+        <div class="card-body">
+          <div class="text-warning mb-2">
+            <i class="fas fa-meh" style="font-size: 2.5rem;"></i>
+          </div>
+          <h3 class="text-warning mb-1">
+            <%= patientMoods.filter(p => p.lastMood && p.lastMood.moodLevel >= 4 && p.lastMood.moodLevel < 7).length %>
+          </h3>
+          <small class="text-muted">Normal</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center h-100">
+        <div class="card-body">
+          <div class="text-danger mb-2">
+            <i class="fas fa-frown" style="font-size: 2.5rem;"></i>
+          </div>
+          <h3 class="text-danger mb-1">
+            <%= patientMoods.filter(p => p.lastMood && p.lastMood.moodLevel < 4).length %>
+          </h3>
+          <small class="text-muted">Dikkat Gerekli</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hasta Listesi -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2 text-info"></i>Hasta Mood Durumları
+          </h5>
+        </div>
+        <div class="card-body">
+          <% if (patientMoods && patientMoods.length > 0) { %>
+            <!-- Tablo Görünümü -->
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Hasta</th>
+                    <th>Son Mood</th>
+                    <th>Duygular</th>
+                    <th>Son Kayıt</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% patientMoods.forEach(function(patientMood) { %>
+                    <tr>
+                      <!-- Hasta Bilgileri -->
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-primary"></i>
+                          </div>
+                          <div>
+                            <div class="fw-semibold"><%= patientMood.patient.name %></div>
+                            <small class="text-muted"><%= patientMood.patient.email %></small>
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Son Mood -->
+                      <td>
+                        <% if (patientMood.lastMood) { %>
+                          <div class="d-flex align-items-center">
+                            <div class="mood-circle mood-<%= patientMood.lastMood.moodLevel %> me-2">
+                              <%= patientMood.lastMood.moodLevel %>
+                            </div>
+                            <div>
+                              <div class="fw-semibold"><%= patientMood.lastMood.moodLevel %>/10</div>
+                              <small class="text-muted">
+                                <% if (patientMood.lastMood.moodLevel <= 3) { %>
+                                  <span class="text-danger">Kötü</span>
+                                <% } else if (patientMood.lastMood.moodLevel <= 6) { %>
+                                  <span class="text-warning">Normal</span>
+                                <% } else if (patientMood.lastMood.moodLevel <= 8) { %>
+                                  <span class="text-success">İyi</span>
+                                <% } else { %>
+                                  <span class="text-primary">Mükemmel</span>
+                                <% } %>
+                              </small>
+                            </div>
+                          </div>
+                        <% } else { %>
+                          <span class="text-muted">-</span>
+                        <% } %>
+                      </td>
+
+                      <!-- Duygular -->
+                      <td>
+                        <% if (patientMood.lastMood && patientMood.lastMood.emotions && patientMood.lastMood.emotions.length > 0) { %>
+                          <% patientMood.lastMood.emotions.slice(0, 2).forEach(function(emotion) { %>
+                            <span class="badge bg-light text-dark me-1 mb-1" style="font-size: 0.7rem;">
+                              <%= emotion %>
+                            </span>
+                          <% }); %>
+                          <% if (patientMood.lastMood.emotions.length > 2) { %>
+                            <span class="badge bg-secondary" style="font-size: 0.7rem;">+<%= patientMood.lastMood.emotions.length - 2 %></span>
+                          <% } %>
+                        <% } else { %>
+                          <span class="text-muted">-</span>
+                        <% } %>
+                      </td>
+
+                      <!-- Son Kayıt -->
+                      <td>
+                        <% if (patientMood.lastMood) { %>
+                          <small class="text-muted">
+                            <%= patientMood.lastMoodDate %>
+                          </small>
+                        <% } else { %>
+                          <span class="text-muted">Kayıt yok</span>
+                        <% } %>
+                      </td>
+
+                      <!-- Durum -->
+                      <td>
+                        <% if (patientMood.lastMood) { %>
+                          <% if (patientMood.lastMood.moodLevel <= 3) { %>
+                            <span class="badge bg-danger">
+                              <i class="fas fa-exclamation-triangle me-1"></i>Dikkat
+                            </span>
+                          <% } else if (patientMood.lastMood.moodLevel <= 6) { %>
+                            <span class="badge bg-warning">
+                              <i class="fas fa-minus-circle me-1"></i>Normal
+                            </span>
+                          <% } else { %>
+                            <span class="badge bg-success">
+                              <i class="fas fa-check-circle me-1"></i>İyi
+                            </span>
+                          <% } %>
+                        <% } else { %>
+                          <span class="badge bg-secondary">
+                            <i class="fas fa-question-circle me-1"></i>Bilinmiyor
+                          </span>
+                        <% } %>
+                      </td>
+
+                      <!-- İşlemler -->
+                      <td>
+                        <div class="btn-group btn-group-sm">
+                          <a href="/mood/patient/<%= patientMood.patient._id %>" class="btn btn-outline-primary" title="Detaylı Analiz">
+                            <i class="fas fa-chart-line"></i>
+                          </a>
+                          <a href="/messages/<%= patientMood.patient._id %>" class="btn btn-outline-info" title="Mesaj Gönder">
+                            <i class="fas fa-comments"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="text-center py-5">
+              <i class="fas fa-users text-muted mb-3" style="font-size: 4rem;"></i>
+              <h4 class="text-muted mb-3">Henüz randevusu olan hasta yok</h4>
+              <p class="text-muted">Hastalarınız randevu aldığında ve mood tracker kullanmaya başladığında veriler burada görünecek.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.mood-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 12px;
+  min-width: 30px;
+}
+
+.mood-1, .mood-2, .mood-3 { background: linear-gradient(135deg, #dc3545, #c82333); }
+.mood-4, .mood-5, .mood-6 { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.mood-7, .mood-8 { background: linear-gradient(135deg, #28a745, #1e7e34); }
+.mood-9, .mood-10 { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+
+.table > :not(caption) > * > * {
+  padding: 1rem 0.75rem;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .mood-circle {
+    width: 25px;
+    height: 25px;
+    font-size: 10px;
+  }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

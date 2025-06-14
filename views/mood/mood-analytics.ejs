@@ -1,0 +1,671 @@
+<!-- eslint-disable -->
+<!-- @ts-nocheck -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruh Hali Analizi - Mindbridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="fw-bold text-primary mb-1">
+        <i class="fas fa-chart-line me-2"></i>Ruh Hali Analizi
+      </h2>
+      <p class="text-muted">Son 30 günlük ruh hali trendlerinizi ve istatistiklerinizi görüntüleyin</p>
+    </div>
+  </div>
+
+  <!-- İstatistik Kartları -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center">
+        <div class="card-body">
+          <div class="text-primary mb-2">
+            <i class="fas fa-calendar-alt" style="font-size: 2rem;"></i>
+          </div>
+          <h3 class="text-primary mb-1"><%= recentMoods.length %></h3>
+          <small class="text-muted">Son 30 Gün</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center">
+        <div class="card-body">
+          <div class="text-success mb-2">
+            <i class="fas fa-smile" style="font-size: 2rem;"></i>
+          </div>
+          <h3 class="text-success mb-1"><%= avgMood %></h3>
+          <small class="text-muted">Ortalama Mood</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center">
+        <div class="card-body">
+          <div class="text-info mb-2">
+            <i class="fas fa-heart" style="font-size: 2rem;"></i>
+          </div>
+          <h3 class="text-info mb-1"><%= Object.keys(emotionCounts).length %></h3>
+          <small class="text-muted">Farklı Duygu</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm text-center">
+        <div class="card-body">
+          <div class="text-warning mb-2">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+          </div>
+          <h3 class="text-warning mb-1"><%= Object.keys(triggerCounts).length %></h3>
+          <small class="text-muted">Tetikleyici</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grafik Alanı -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <h5 class="card-title mb-2 mb-md-0">
+              <i class="fas fa-chart-line me-2 text-primary"></i>Mood Trendi
+            </h5>
+            <div class="d-flex flex-column flex-md-row gap-2">
+              <!-- Zaman Aralığı -->
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-primary active" onclick="changeTimeRange(1, 'day')">
+                  Bugün
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="changeTimeRange(7, 'day')">
+                  7 Gün
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="changeTimeRange(30, 'day')">
+                  30 Gün
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="changeTimeRange(90, 'day')">
+                  3 Ay
+                </button>
+              </div>
+              <!-- Gruplama Türü -->
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary" id="groupMinute" onclick="changeGrouping('minute')">
+                  Dakikalık
+                </button>
+                <button type="button" class="btn btn-outline-secondary active" id="groupHour" onclick="changeGrouping('hour')">
+                  Saatlik
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="groupDay" onclick="changeGrouping('day')">
+                  Günlük
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="groupWeek" onclick="changeGrouping('week')">
+                  Haftalık
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="mb-3 d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              <i class="fas fa-info-circle me-1"></i>
+              <span id="chartInfo">Bugünkü saatlik mood trendini görüntülüyorsunuz</span>
+            </small>
+            <small class="text-muted">
+              <span id="dataCount">0 kayıt</span>
+            </small>
+          </div>
+          <div style="height: 300px;">
+            <canvas id="moodChart"></canvas>
+          </div>
+          <div class="mt-3 text-center">
+            <small class="text-muted">
+              <span class="badge bg-danger me-2">1-3 Kötü</span>
+              <span class="badge bg-warning me-2">4-6 Normal</span>
+              <span class="badge bg-success me-2">7-8 İyi</span>
+              <span class="badge bg-primary">9-10 Mükemmel</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mood Dağılımı Pie Chart -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-chart-pie me-2 text-success"></i>Mood Dağılımı
+          </h5>
+        </div>
+        <div class="card-body">
+          <div style="height: 250px;">
+            <canvas id="moodPieChart"></canvas>
+          </div>
+          <div class="mt-3">
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="border-end">
+                  <h6 class="text-danger mb-1" id="badMoodPercent">0%</h6>
+                  <small class="text-muted">Kötü</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <h6 class="text-success mb-1" id="goodMoodPercent">0%</h6>
+                <small class="text-muted">İyi</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Duygular ve Tetikleyiciler -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-heart me-2 text-danger"></i>En Sık Yaşanan Duygular
+          </h5>
+        </div>
+        <div class="card-body">
+          <% if (Object.keys(emotionCounts).length > 0) { %>
+            <% Object.entries(emotionCounts).sort((a, b) => b[1] - a[1]).forEach(function([emotion, count]) { %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold"><%= emotion %></span>
+                <div class="d-flex align-items-center">
+                  <div class="progress me-2" style="width: 100px; height: 8px;">
+                    <div class="progress-bar bg-danger" style="width: <%= Math.round((count / Math.max(...Object.values(emotionCounts))) * 100) %>%"></div>
+                  </div>
+                  <span class="badge bg-danger"><%= count %></span>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p class="text-muted text-center">Henüz duygu verisi yok</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-exclamation-triangle me-2 text-warning"></i>En Sık Tetikleyiciler
+          </h5>
+        </div>
+        <div class="card-body">
+          <% if (Object.keys(triggerCounts).length > 0) { %>
+            <% Object.entries(triggerCounts).sort((a, b) => b[1] - a[1]).forEach(function([trigger, count]) { %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold"><%= trigger %></span>
+                <div class="d-flex align-items-center">
+                  <div class="progress me-2" style="width: 100px; height: 8px;">
+                    <div class="progress-bar bg-warning" style="width: <%= Math.round((count / Math.max(...Object.values(triggerCounts))) * 100) %>%"></div>
+                  </div>
+                  <span class="badge bg-warning"><%= count %></span>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p class="text-muted text-center">Henüz tetikleyici verisi yok</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Son Kayıtlar -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-clock me-2 text-info"></i>Son Kayıtlar
+          </h5>
+          <a href="/mood/history" class="btn btn-outline-primary btn-sm">
+            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body">
+          <% if (recentMoods && recentMoods.length > 0) { %>
+            <% recentMoods.slice(0, 5).forEach(function(mood) { %>
+              <div class="d-flex align-items-center mb-3">
+                <div class="mood-circle mood-<%= mood.moodLevel %> me-3">
+                  <%= mood.moodLevel %>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold">
+                    <%= moment(mood.date).format('DD MMM YYYY') %>
+                  </div>
+                  <small class="text-muted">
+                    <% if (mood.emotions && mood.emotions.length > 0) { %>
+                      <%= mood.emotions.join(', ') %>
+                    <% } else { %>
+                      Duygu belirtilmemiş
+                    <% } %>
+                  </small>
+                </div>
+                <small class="text-muted">
+                  <%= moment(mood.date).fromNow() %>
+                </small>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p class="text-muted text-center">Henüz kayıt yok</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.mood-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+
+.mood-1, .mood-2, .mood-3 { background: linear-gradient(135deg, #dc3545, #c82333); }
+.mood-4, .mood-5, .mood-6 { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.mood-7, .mood-8 { background: linear-gradient(135deg, #28a745, #1e7e34); }
+.mood-9, .mood-10 { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+</style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let moodChart;
+let moodPieChart;
+let currentTimeRange = 1;
+let currentGrouping = 'hour';
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadChart();
+  loadPieChart();
+});
+
+function changeTimeRange(range, unit) {
+  currentTimeRange = range;
+  
+  // Button aktif durumunu güncelle
+  document.querySelectorAll('.btn-group:first-child button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Otomatik gruplama öner
+  autoSuggestGrouping(range);
+  loadChart();
+}
+
+function changeGrouping(groupType) {
+  currentGrouping = groupType;
+  
+  // Button aktif durumunu güncelle
+  document.querySelectorAll('.btn-group:last-child button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.getElementById('group' + groupType.charAt(0).toUpperCase() + groupType.slice(1)).classList.add('active');
+  
+  loadChart();
+}
+
+function autoSuggestGrouping(range) {
+  let suggestedGrouping = 'day';
+  
+  if (range === 1) {
+    suggestedGrouping = 'minute';  // Bugün için dakikalık öner
+  } else if (range <= 7) {
+    suggestedGrouping = 'hour';    // 7 gün için saatlik öner
+  } else if (range <= 30) {
+    suggestedGrouping = 'day';     // 30 gün için günlük öner
+  } else if (range <= 90) {
+    suggestedGrouping = 'week';    // 3 ay için haftalık öner
+  }
+  
+  if (suggestedGrouping !== currentGrouping) {
+    currentGrouping = suggestedGrouping;
+    document.querySelectorAll('.btn-group:last-child button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.getElementById('group' + suggestedGrouping.charAt(0).toUpperCase() + suggestedGrouping.slice(1)).classList.add('active');
+  }
+}
+
+function loadChart() {
+  fetch('/mood/api/range?days=' + currentTimeRange + '&grouping=' + currentGrouping)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const groupedData = groupMoodData(data.moods, currentGrouping);
+        updateChart(groupedData);
+        updatePieChart(data.moods);
+        updateChartInfo(data.moods.length);
+      } else {
+        updateChart([]);
+        updatePieChart([]);
+        updateChartInfo(0);
+      }
+    })
+    .catch(error => {
+      console.error('Chart error:', error);
+      updateChart([]);
+      updatePieChart([]);
+      updateChartInfo(0);
+    });
+}
+
+function loadPieChart() {
+  fetch('/mood/api/range?days=30')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        updatePieChart(data.moods);
+      }
+    })
+    .catch(error => {
+      console.error('Pie chart error:', error);
+    });
+}
+
+function groupMoodData(moods, groupType) {
+  if (!moods || moods.length === 0) return [];
+  
+  const groups = {};
+  
+  moods.forEach(mood => {
+    const date = new Date(mood.date);
+    let groupKey;
+    
+    switch(groupType) {
+      case 'minute':
+        groupKey = date.getFullYear() + '-' + 
+                  String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                  String(date.getDate()).padStart(2, '0') + ' ' + 
+                  String(date.getHours()).padStart(2, '0') + ':' + 
+                  String(date.getMinutes()).padStart(2, '0'); // 1 dakikalık gruplar
+        break;
+      case 'hour':
+        groupKey = date.getFullYear() + '-' + 
+                  String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                  String(date.getDate()).padStart(2, '0') + ' ' + 
+                  String(date.getHours()).padStart(2, '0') + ':00';
+        break;
+      case 'day':
+        groupKey = date.getFullYear() + '-' + 
+                  String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                  String(date.getDate()).padStart(2, '0');
+        break;
+      case 'week':
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        groupKey = weekStart.getFullYear() + '-W' + 
+                  String(Math.ceil((weekStart.getTime() - new Date(weekStart.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000))).padStart(2, '0');
+        break;
+      default:
+        groupKey = date.toDateString();
+    }
+    
+    if (!groups[groupKey]) {
+      groups[groupKey] = [];
+    }
+    groups[groupKey].push(mood);
+  });
+  
+  // Her grup için ortalama mood hesapla
+  return Object.entries(groups).map(([key, groupMoods]) => {
+    const avgMood = groupMoods.reduce((sum, mood) => sum + mood.moodLevel, 0) / groupMoods.length;
+    const allEmotions = groupMoods.flatMap(mood => mood.emotions || []);
+    
+    return {
+      label: formatGroupLabel(key, groupType),
+      value: Math.round(avgMood * 10) / 10,
+      count: groupMoods.length,
+      emotions: [...new Set(allEmotions)],
+      rawKey: key
+    };
+  }).sort((a, b) => a.rawKey.localeCompare(b.rawKey));
+}
+
+function formatGroupLabel(key, groupType) {
+  switch(groupType) {
+    case 'minute':
+      const [datePart, timePart] = key.split(' ');
+      const [year, month, day] = datePart.split('-');
+      const date = new Date(year, month - 1, day);
+      const isToday = date.toDateString() === new Date().toDateString();
+      return isToday ? timePart : day + '/' + month + ' ' + timePart;
+    case 'hour':
+      const [datePartH, timePartH] = key.split(' ');
+      const [yearH, monthH, dayH] = datePartH.split('-');
+      const dateH = new Date(yearH, monthH - 1, dayH);
+      const isTodayH = dateH.toDateString() === new Date().toDateString();
+      return isTodayH ? timePartH : dayH + '/' + monthH + ' ' + timePartH;
+    case 'day':
+      const [y, m, d] = key.split('-');
+      return d + '/' + m;
+    case 'week':
+      return key.replace('-W', '. Hafta ');
+    default:
+      return key;
+  }
+}
+
+function updateChart(data) {
+  const ctx = document.getElementById('moodChart').getContext('2d');
+  
+  if (moodChart) {
+    moodChart.destroy();
+  }
+  
+  const chartData = data.map(item => ({
+    x: item.label,
+    y: item.value
+  }));
+  
+  const pointColors = data.map(item => {
+    if (item.value <= 3) return '#dc3545';
+    if (item.value <= 6) return '#ffc107';
+    if (item.value <= 8) return '#28a745';
+    return '#6a11cb';
+  });
+  
+  moodChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'Ortalama Mood',
+        data: chartData,
+        borderColor: '#6a11cb',
+        backgroundColor: 'rgba(106, 17, 203, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointBackgroundColor: pointColors,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: function(context) {
+              const item = data[context[0].dataIndex];
+              return item.label + (item.count > 1 ? ' (' + item.count + ' kayıt)' : '');
+            },
+            label: function(context) {
+              const mood = context.parsed.y;
+              let moodText = mood <= 3 ? 'Kötü' : mood <= 6 ? 'Normal' : mood <= 8 ? 'İyi' : 'Mükemmel';
+              return 'Ortalama Mood: ' + mood + '/10 (' + moodText + ')';
+            },
+            afterLabel: function(context) {
+              const item = data[context.dataIndex];
+              return item.emotions.length > 0 ? 'Duygular: ' + item.emotions.join(', ') : '';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 10,
+          ticks: {
+            stepSize: 1,
+            callback: function(value) { return value + '/10'; }
+          },
+          grid: { color: 'rgba(0,0,0,0.1)' }
+        },
+        x: {
+          grid: { color: 'rgba(0,0,0,0.1)' },
+          ticks: { maxTicksLimit: 12 }
+        }
+      }
+    }
+  });
+}
+
+function updatePieChart(moods) {
+  const ctx = document.getElementById('moodPieChart').getContext('2d');
+  
+  if (moodPieChart) {
+    moodPieChart.destroy();
+  }
+  
+  if (!moods || moods.length === 0) {
+    moodPieChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Veri Yok'],
+        datasets: [{
+          data: [1],
+          backgroundColor: ['#e9ecef'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+    
+    document.getElementById('badMoodPercent').textContent = '0%';
+    document.getElementById('goodMoodPercent').textContent = '0%';
+    return;
+  }
+  
+  // Mood kategorilerini say
+  const moodCategories = {
+    'Kötü (1-3)': moods.filter(m => m.moodLevel <= 3).length,
+    'Normal (4-6)': moods.filter(m => m.moodLevel >= 4 && m.moodLevel <= 6).length,
+    'İyi (7-8)': moods.filter(m => m.moodLevel >= 7 && m.moodLevel <= 8).length,
+    'Mükemmel (9-10)': moods.filter(m => m.moodLevel >= 9).length
+  };
+  
+  const labels = Object.keys(moodCategories).filter(key => moodCategories[key] > 0);
+  const data = labels.map(label => moodCategories[label]);
+  const colors = labels.map(label => {
+    if (label.includes('Kötü')) return '#dc3545';
+    if (label.includes('Normal')) return '#ffc107';
+    if (label.includes('İyi')) return '#28a745';
+    return '#6a11cb';
+  });
+  
+  moodPieChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            usePointStyle: true,
+            font: { size: 11 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((context.parsed / total) * 100);
+              return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Yüzdeleri güncelle
+  const badCount = moodCategories['Kötü (1-3)'];
+  const goodCount = moodCategories['İyi (7-8)'] + moodCategories['Mükemmel (9-10)'];
+  const total = moods.length;
+  
+  const badPercent = total > 0 ? Math.round((badCount / total) * 100) : 0;
+  const goodPercent = total > 0 ? Math.round((goodCount / total) * 100) : 0;
+  
+  document.getElementById('badMoodPercent').textContent = badPercent + '%';
+  document.getElementById('goodMoodPercent').textContent = goodPercent + '%';
+}
+
+function updateChartInfo(dataCount) {
+  const chartInfo = document.getElementById('chartInfo');
+  const dataCountEl = document.getElementById('dataCount');
+  
+  let timeText = '';
+  if (currentTimeRange === 1) timeText = 'Bugünkü';
+  else if (currentTimeRange === 7) timeText = 'Son 7 günlük';
+  else if (currentTimeRange === 30) timeText = 'Son 30 günlük';
+  else if (currentTimeRange === 90) timeText = 'Son 3 aylık';
+  
+  let groupText = '';
+  if (currentGrouping === 'minute') groupText = 'dakikalık';
+  else if (currentGrouping === 'hour') groupText = 'saatlik';
+  else if (currentGrouping === 'day') groupText = 'günlük';
+  else if (currentGrouping === 'week') groupText = 'haftalık';
+  
+  chartInfo.textContent = timeText + ' ' + groupText + ' mood trendini görüntülüyorsunuz';
+  dataCountEl.textContent = dataCount + ' kayıt';
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

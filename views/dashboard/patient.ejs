@@ -79,10 +79,10 @@
                 <div class="col-md-3 mb-3">
                     <div class="card text-center h-100">
                         <div class="card-body">
-                            <i class="fas fa-chart-line fa-2x text-warning mb-3"></i>
-                            <h6>İlerleme</h6>
-                            <a href="#" class="btn btn-warning btn-sm">
-                                Raporlar
+                            <i class="fas fa-heart fa-2x text-warning mb-3"></i>
+                            <h6>Ruh Hali</h6>
+                            <a href="/mood" class="btn btn-warning btn-sm">
+                                Mood Takibi
                             </a>
                         </div>
                     </div>
@@ -186,6 +186,34 @@
                                 Düzenli meditasyon ve nefes egzersizleri, stress seviyenizi düşürmeye ve 
                                 zihinsel berraklığınızı artırmaya yardımcı olabilir.
                             </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Mood Widget -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-heart me-2 text-danger"></i>
+                                Ruh Hali Durumu
+                            </h6>
+                            <a href="/mood" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-chart-line"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div id="moodWidget">
+                                <div class="text-center">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Yükleniyor...</span>
+                                    </div>
+                                    <p class="text-muted mt-2 mb-0">Mood durumu yükleniyor...</p>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="/mood/entry" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-1"></i>Yeni Kayıt
+                                </a>
+                            </div>
                         </div>
                     </div>
                     
@@ -294,4 +322,132 @@
 
 <%- include('../partials/footer', {
     additionalJS: '<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>'
-}) %> 
+}) %>
+
+<script>
+// Mood Widget JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    loadMoodWidget();
+});
+
+async function loadMoodWidget() {
+    try {
+        // Bugünkü mood kontrolü
+        const dailyResponse = await fetch('/mood/api/daily');
+        const dailyData = await dailyResponse.json();
+        
+        // Son 7 günlük trend
+        const weeklyResponse = await fetch('/mood/api/weekly');
+        const weeklyData = await weeklyResponse.json();
+        
+        displayMoodWidget(dailyData, weeklyData);
+    } catch (error) {
+        console.error('Mood widget error:', error);
+        document.getElementById('moodWidget').innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-exclamation-triangle mb-2"></i>
+                <p class="mb-0">Mood verileri yüklenemedi</p>
+            </div>
+        `;
+    }
+}
+
+function displayMoodWidget(dailyData, weeklyData) {
+    const widget = document.getElementById('moodWidget');
+    
+    let html = '';
+    
+    // Bugünkü mood
+    if (dailyData.success && dailyData.todayMood) {
+        const mood = dailyData.todayMood;
+        let moodColor = '';
+        let moodText = '';
+        
+        if (mood.moodLevel <= 3) {
+            moodColor = 'danger';
+            moodText = 'Kötü';
+        } else if (mood.moodLevel <= 6) {
+            moodColor = 'warning';
+            moodText = 'Normal';
+        } else if (mood.moodLevel <= 8) {
+            moodColor = 'success';
+            moodText = 'İyi';
+        } else {
+            moodColor = 'primary';
+            moodText = 'Mükemmel';
+        }
+        
+        html += `
+            <div class="text-center mb-3">
+                <div class="mood-circle-widget bg-${moodColor} mx-auto mb-2">
+                    ${mood.moodLevel}
+                </div>
+                <h6 class="text-${moodColor} mb-1">Bugün: ${mood.moodLevel}/10</h6>
+                <small class="text-muted">${moodText}</small>
+            </div>
+        `;
+        
+        // Son duygular
+        if (mood.emotions && mood.emotions.length > 0) {
+            html += `
+                <div class="mb-2">
+                    <small class="text-muted d-block mb-1">Duygular:</small>
+                    <div>
+                        ${mood.emotions.slice(0, 3).map(emotion => 
+                            `<span class="badge bg-light text-dark me-1" style="font-size: 0.7rem;">${emotion}</span>`
+                        ).join('')}
+                        ${mood.emotions.length > 3 ? `<span class="badge bg-secondary" style="font-size: 0.7rem;">+${mood.emotions.length - 3}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        html += `
+            <div class="text-center mb-3">
+                <div class="mood-circle-widget bg-light text-muted mx-auto mb-2">
+                    ?
+                </div>
+                <h6 class="text-muted mb-1">Bugün kayıt yok</h6>
+                <small class="text-muted">Mood kaydı ekleyin</small>
+            </div>
+        `;
+    }
+    
+    // Haftalık özet
+    if (weeklyData.success && weeklyData.weeklyMoods.length > 0) {
+        const avgMood = (weeklyData.weeklyMoods.reduce((sum, mood) => sum + mood.moodLevel, 0) / weeklyData.weeklyMoods.length).toFixed(1);
+        html += `
+            <div class="border-top pt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Bu hafta ortalama:</small>
+                    <span class="badge bg-info">${avgMood}/10</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <small class="text-muted">Toplam kayıt:</small>
+                    <span class="badge bg-secondary">${weeklyData.weeklyMoods.length}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    widget.innerHTML = html;
+}
+</script>
+
+<style>
+.mood-circle-widget {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 18px;
+}
+
+.mood-circle-widget.bg-light {
+    border: 2px solid #dee2e6;
+}
+</style> 

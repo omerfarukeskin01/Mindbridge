@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yeni Ruh Hali Kaydı - Mindbridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+  <!-- Başlık -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/mood">Ruh Hali</a></li>
+          <li class="breadcrumb-item active">Yeni Kayıt</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold text-primary mb-1">
+        <i class="fas fa-plus me-2"></i>Yeni Ruh Hali Kaydı
+      </h2>
+      <p class="text-muted">Bugünkü ruh halinizi ve duygularınızı kaydedin</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form action="/mood/add" method="POST" id="moodForm">
+            
+            <!-- Ruh Hali Seviyesi -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-thermometer-half me-2 text-primary"></i>
+                Ruh Hali Seviyeniz (1-10)
+              </label>
+              <div class="mood-scale mt-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <small class="text-muted">Çok Kötü</small>
+                  <small class="text-muted">Mükemmel</small>
+                </div>
+                <div class="mood-buttons d-flex justify-content-between">
+                  <% for(let i = 1; i <= 10; i++) { %>
+                    <button type="button" class="btn mood-btn" data-mood="<%= i %>">
+                      <%= i %>
+                    </button>
+                  <% } %>
+                </div>
+                <input type="hidden" name="moodLevel" id="moodLevel" required>
+                <div class="mood-feedback mt-2 text-center">
+                  <span id="moodText" class="fw-semibold"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Duygular -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-heart me-2 text-danger"></i>
+                Hissettiğiniz Duygular
+              </label>
+              <p class="text-muted small">Birden fazla seçebilirsiniz</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="mutlu" id="mutlu">
+                    <label class="form-check-label" for="mutlu">
+                      😊 Mutlu
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="üzgün" id="uzgun">
+                    <label class="form-check-label" for="uzgun">
+                      😢 Üzgün
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="kaygılı" id="kaygili">
+                    <label class="form-check-label" for="kaygili">
+                      😰 Kaygılı
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="kızgın" id="kizgin">
+                    <label class="form-check-label" for="kizgin">
+                      😠 Kızgın
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="heyecanlı" id="heyecanli">
+                    <label class="form-check-label" for="heyecanli">
+                      🤩 Heyecanlı
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="sakin" id="sakin">
+                    <label class="form-check-label" for="sakin">
+                      😌 Sakin
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="stresli" id="stresli">
+                    <label class="form-check-label" for="stresli">
+                      😫 Stresli
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="umutlu" id="umutlu">
+                    <label class="form-check-label" for="umutlu">
+                      🌟 Umutlu
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="yorgun" id="yorgun">
+                    <label class="form-check-label" for="yorgun">
+                      😴 Yorgun
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="emotions" value="enerjik" id="enerjik">
+                    <label class="form-check-label" for="enerjik">
+                      ⚡ Enerjik
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tetikleyiciler -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                Tetikleyici Faktörler
+              </label>
+              <p class="text-muted small">Ruh halinizi etkileyen faktörler (isteğe bağlı)</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="iş" id="is">
+                    <label class="form-check-label" for="is">
+                      💼 İş
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="aile" id="aile">
+                    <label class="form-check-label" for="aile">
+                      👨‍👩‍👧‍👦 Aile
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="ilişkiler" id="iliskiler">
+                    <label class="form-check-label" for="iliskiler">
+                      💕 İlişkiler
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="sağlık" id="saglik">
+                    <label class="form-check-label" for="saglik">
+                      🏥 Sağlık
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="para" id="para">
+                    <label class="form-check-label" for="para">
+                      💰 Para
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="sosyal" id="sosyal">
+                    <label class="form-check-label" for="sosyal">
+                      👥 Sosyal
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="okul" id="okul">
+                    <label class="form-check-label" for="okul">
+                      🎓 Okul
+                    </label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="triggers" value="diğer" id="diger">
+                    <label class="form-check-label" for="diger">
+                      ❓ Diğer
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notlar -->
+            <div class="mb-4">
+              <label for="notes" class="form-label fw-semibold">
+                <i class="fas fa-sticky-note me-2 text-info"></i>
+                Notlarınız
+              </label>
+              <textarea class="form-control" id="notes" name="notes" rows="4" 
+                        placeholder="Bugün nasıl hissettiniz? Neler yaşadınız? (İsteğe bağlı)"
+                        maxlength="500"></textarea>
+              <div class="form-text">Maksimum 500 karakter</div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="d-flex justify-content-between">
+              <a href="/mood" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Geri Dön
+              </a>
+              <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                <i class="fas fa-save me-1"></i>Kaydet
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.mood-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #dee2e6;
+  background: white;
+  color: #6c757d;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.mood-btn:hover {
+  border-color: #0d6efd;
+  color: #0d6efd;
+  transform: scale(1.1);
+}
+
+.mood-btn.active {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border-color: #0d6efd;
+  color: white;
+  transform: scale(1.2);
+}
+
+.mood-scale {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .mood-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const moodButtons = document.querySelectorAll('.mood-btn');
+  const moodLevelInput = document.getElementById('moodLevel');
+  const moodText = document.getElementById('moodText');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  // Bugün kayıt var mı kontrol et
+  checkTodayEntry();
+  
+  const moodTexts = {
+    1: '😞 Çok kötü',
+    2: '😔 Kötü',
+    3: '😕 Biraz kötü',
+    4: '😐 Vasat',
+    5: '😊 Normal',
+    6: '🙂 İyi',
+    7: '😄 Çok iyi',
+    8: '😁 Harika',
+    9: '🤩 Mükemmel',
+    10: '🌟 Fantastik'
+  };
+  
+  moodButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const moodValue = this.dataset.mood;
+      
+      // Tüm butonlardan active class'ını kaldır
+      moodButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Seçilen butona active class ekle
+      this.classList.add('active');
+      
+      // Hidden input'u güncelle
+      moodLevelInput.value = moodValue;
+      
+      // Mood text'i güncelle
+      moodText.textContent = moodTexts[moodValue];
+      
+      // Submit butonunu aktif et
+      submitBtn.disabled = false;
+    });
+  });
+  
+  // Form validation
+  document.getElementById('moodForm').addEventListener('submit', function(e) {
+    if (!moodLevelInput.value) {
+      e.preventDefault();
+      alert('Lütfen ruh hali seviyenizi seçin!');
+    }
+  });
+});
+
+function checkTodayEntry() {
+  fetch('/mood/api/daily')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.todayMood) {
+        // Bugün zaten kayıt var - bilgi göster
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info alert-dismissible fade show';
+        alertDiv.innerHTML = `
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>Bilgi:</strong> Bugün zaten bir ruh hali kaydınız var (${data.todayMood.moodLevel}/10 - ${new Date(data.todayMood.date).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'})}). 
+          Yeni kayıt eklerseniz günlük analizlerde en son kayıt kullanılacaktır.
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Form'un üstüne ekle
+        const form = document.getElementById('moodForm');
+        form.parentNode.insertBefore(alertDiv, form);
+      }
+    })
+    .catch(error => {
+      console.error('Today check error:', error);
+    });
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

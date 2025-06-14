@@ -194,7 +194,11 @@
               <h4 class="text-warning mb-1"><%= stat.activePts %></h4>
               <small class="text-muted">Aktif Danışan</small>
               <% if (stat.activePts > 0) { %>
-                <div class="mt-2"><span class="badge bg-warning-subtle text-warning">30 gün: <%= stat.activePts %></span></div>
+                <div class="mt-2">
+                  <a href="/mood/my-patients" class="btn btn-sm btn-outline-warning">
+                    <i class="fas fa-heart me-1"></i>Mood Takibi
+                  </a>
+                </div>
               <% } %>
             </div>
           </div>

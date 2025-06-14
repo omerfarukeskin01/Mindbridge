@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruh Hali Geçmişi - Mindbridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="fw-bold text-primary mb-1">
+        <i class="fas fa-history me-2"></i>Ruh Hali Geçmişi
+      </h2>
+      <p class="text-muted">Geçmiş ruh hali kayıtlarınızı görüntüleyin</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <% if (moods && moods.length > 0) { %>
+        <% moods.forEach(function(mood) { %>
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                  <div class="mood-circle mood-<%= mood.moodLevel %> mx-auto mb-2">
+                    <%= mood.moodLevel %>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="text-primary fw-semibold">
+                    <%= moment(mood.date).format('DD MMM YYYY') %>
+                  </div>
+                  <small class="text-muted">
+                    <%= moment(mood.date).format('HH:mm') %>
+                  </small>
+                </div>
+                <div class="col-md-4">
+                  <% if (mood.emotions && mood.emotions.length > 0) { %>
+                    <% mood.emotions.forEach(function(emotion) { %>
+                      <span class="badge bg-light text-dark me-1">
+                        <%= emotion %>
+                      </span>
+                    <% }); %>
+                  <% } %>
+                </div>
+                <div class="col-md-3">
+                  <% if (mood.notes && mood.notes.trim()) { %>
+                    <p class="mb-0 small">
+                      <%= mood.notes.length > 50 ? mood.notes.substring(0, 50) + '...' : mood.notes %>
+                    </p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="text-center py-5">
+          <h4 class="text-muted mb-3">Henüz ruh hali kaydınız yok</h4>
+          <a href="/mood/entry" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>İlk Kaydımı Oluştur
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+.mood-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 18px;
+}
+
+.mood-1, .mood-2, .mood-3 { background: linear-gradient(135deg, #dc3545, #c82333); }
+.mood-4, .mood-5, .mood-6 { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.mood-7, .mood-8 { background: linear-gradient(135deg, #28a745, #1e7e34); }
+.mood-9, .mood-10 { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
